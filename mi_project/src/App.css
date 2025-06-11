@@ -1,0 +1,146 @@
+.App {
+  text-align: center;
+  padding: 20px;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  min-height: 100vh;
+}
+
+.habits-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Formulario de hábitos */
+.habit-form {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.habit-form input,
+.habit-form textarea,
+.habit-form select {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.habit-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.habit-form button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.habit-form button:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.habit-form button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Lista de hábitos */
+.habits-list {
+  list-style: none;
+  padding: 0;
+}
+
+.habit-item {
+  background-color: #f5f5f5;
+  color: #333;
+  margin: 15px 0;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.habit-content {
+  flex: 1;
+}
+
+.habit-item h3 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+}
+
+.habit-item p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.frequency {
+  background-color: #3498db;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 15px;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+.loading,
+.error {
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 4px;
+}
+
+.loading {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.error {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.refresh-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.refresh-btn:hover {
+  background-color: #45a049;
+}

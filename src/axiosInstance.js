@@ -1,4 +1,5 @@
 import axios from "axios"
+import { auth } from "./firebase/config"
 
 // Configuración base de Axios
 const axiosInstance = axios.create({
@@ -9,11 +10,25 @@ const axiosInstance = axios.create({
   },
 })
 
-// Interceptor para requests (opcional - para agregar tokens, etc.)
+// Interceptor para requests - agregar token de autenticación automáticamente
 axiosInstance.interceptors.request.use(
-  (config) => {
-    console.log(`🚀 ${config.method?.toUpperCase()} ${config.url}`)
-    return config
+  async (config) => {
+    try {
+      // Obtener el usuario actual
+      const currentUser = auth.currentUser
+
+      if (currentUser) {
+        // Obtener el token de ID del usuario
+        const token = await currentUser.getIdToken()
+        config.headers.Authorization = `Bearer ${token}`
+      }
+
+      console.log(`🚀 ${config.method?.toUpperCase()} ${config.url}`)
+      return config
+    } catch (error) {
+      console.error("Error obteniendo token:", error)
+      return config
+    }
   },
   (error) => {
     return Promise.reject(error)
@@ -26,11 +41,37 @@ axiosInstance.interceptors.response.use(
     console.log(`✅ ${response.status} ${response.config.url}`)
     return response
   },
-  (error) => {
+  async (error) => {
     console.error("❌ Error en la petición:", error.response?.data || error.message)
 
-    // Manejo específico de errores
-    if (error.response?.status === 404) {
+    // Manejo específico de errores de autenticación
+    if (error.response?.status === 401) {
+      console.error("🔐 Error de autenticación:", error.response.data)
+      
+      // Verificar si el usuario aún existe
+      const currentUser = auth.currentUser
+      if (!currentUser) {
+        console.error("❌ Usuario no encontrado en auth")
+        window.location.href = "/login"
+        return
+      }
+
+      console.log("🔄 Intentando renovar token...")
+      
+      try {
+        const newToken = await currentUser.getIdToken(true) // Forzar renovación
+        console.log("✅ Token renovado exitosamente")
+
+        // Reintentar la petición original
+        const originalRequest = error.config
+        originalRequest.headers.Authorization = `Bearer ${newToken}`
+        
+        return axiosInstance(originalRequest)
+      } catch (refreshError) {
+        console.error("❌ Error renovando token:", refreshError)
+        window.location.href = "/login"
+      }
+    } else if (error.response?.status === 404) {
       console.error("Recurso no encontrado")
     } else if (error.response?.status === 500) {
       console.error("Error interno del servidor")

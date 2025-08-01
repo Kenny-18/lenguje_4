@@ -16,6 +16,12 @@
   padding: 20px;
 }
 
+.user-info {
+  color: #666;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
 /* Formulario de hábitos */
 .habit-form {
   background-color: #f8f9fa;
@@ -92,8 +98,23 @@
   color: #666;
 }
 
+.habit-meta {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
 .frequency {
   background-color: #3498db;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.created-date {
+  background-color: #95a5a6;
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
@@ -112,6 +133,18 @@
 
 .delete-btn:hover {
   background-color: #c82333;
+}
+
+.no-habits {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  color: #666;
+}
+
+.no-habits p {
+  margin: 10px 0;
 }
 
 .loading,

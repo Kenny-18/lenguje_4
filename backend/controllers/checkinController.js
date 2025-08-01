@@ -2,6 +2,7 @@ import { startOfDay, endOfDay, parseISO } from "date-fns"
 import Checkin from "../models/Checkin.js"
 import Habit from "../models/Habit.js"
 import { updateStreak } from "../services/streakService.js"
+import { checkAchievements } from "../services/achievementService.js" // Import the new service
 
 // POST /api/habits/:id/checkins - Crear check-in para un hábito
 export const createCheckin = async (req, res) => {
@@ -47,6 +48,9 @@ export const createCheckin = async (req, res) => {
 
     // Actualizar racha
     const updatedHabit = await updateStreak(habitId, userId, today)
+
+    // ✅ NEW: Check for achievements after streak update
+    await checkAchievements(userId, habitId, today)
 
     res.status(201).json({
       message: "Check-in registrado exitosamente",

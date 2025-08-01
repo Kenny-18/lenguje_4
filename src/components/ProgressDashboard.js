@@ -15,6 +15,8 @@ import {
   PointElement,
 } from "chart.js"
 import { Bar } from "react-chartjs-2"
+import html2canvas from "html2canvas" // NEW: Import html2canvas
+// import { WhatsappShareButton, WhatsappIcon } from "react-share"; // Optional: for react-share components
 
 // Registrar componentes de Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend)
@@ -23,6 +25,9 @@ const ProgressDashboard = () => {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [shareLink, setShareLink] = useState(null) // NEW: State for the generated share link
+  const [sharing, setSharing] = useState(false) // NEW: State for sharing loading
+  const [shareError, setShareError] = useState(null) // NEW: State for sharing errors
   const { currentUser } = useAuth()
 
   // Función para obtener estadísticas
@@ -40,13 +45,50 @@ const ProgressDashboard = () => {
     } finally {
       setLoading(false)
     }
-  }, [currentUser]) // fetchStats depende de currentUser
+  }, [currentUser])
 
   useEffect(() => {
     if (currentUser) {
       fetchStats()
     }
-  }, [currentUser, fetchStats]) // Agregar fetchStats a las dependencias
+  }, [currentUser, fetchStats])
+
+  // NEW: Handle sharing progress
+  const handleShareProgress = async () => {
+    setSharing(true)
+    setShareLink(null)
+    setShareError(null)
+
+    try {
+      const dashboardElement = document.querySelector(".progress-dashboard")
+      if (!dashboardElement) {
+        throw new Error("No se encontró el elemento del dashboard para capturar.")
+      }
+
+      // Capture the dashboard as an image
+      const canvas = await html2canvas(dashboardElement, {
+        useCORS: true, // Important for images loaded from other origins
+        scale: 2, // Increase scale for better quality
+        logging: false, // Disable html2canvas logs
+      })
+
+      const imageData = canvas.toDataURL("image/png") // Get base64 image data
+
+      // Send image data to backend to get a shareable link
+      const response = await axiosInstance.post("/share", {
+        imageUrl: imageData,
+        // You could add more context here, e.g., habitId if sharing a specific habit's stats
+      })
+
+      setShareLink(response.data.shareUrl)
+      alert("¡Link para compartir generado! Puedes copiarlo o usar las opciones de compartir.")
+    } catch (err) {
+      console.error("Error al compartir progreso:", err)
+      setShareError("Error al generar link para compartir: " + (err.response?.data?.message || err.message))
+    } finally {
+      setSharing(false)
+    }
+  }
 
   if (!currentUser) {
     return <div className="loading">Verificando autenticación...</div>
@@ -128,11 +170,12 @@ const ProgressDashboard = () => {
 
   return (
     <div className="progress-dashboard">
+      {" "}
+      {/* This is the element to be captured */}
       <div className="dashboard-header-section">
         <h2>Dashboard de Progreso</h2>
         <p className="dashboard-subtitle">Resumen de tu progreso en los últimos 30 días</p>
       </div>
-
       {/* KPI Cards */}
       <div className="kpi-grid">
         <div className="kpi-card primary">
@@ -171,14 +214,12 @@ const ProgressDashboard = () => {
           </div>
         </div>
       </div>
-
       {/* Chart Section */}
       <div className="chart-section">
         <div className="chart-container">
           <Bar data={chartData} options={chartOptions} height={300} />
         </div>
       </div>
-
       {/* Additional Stats */}
       <div className="additional-stats">
         <div className="stats-grid">
@@ -204,9 +245,39 @@ const ProgressDashboard = () => {
           )}
         </div>
       </div>
-
+      {/* Share Button and Message */}
+      <div className="dashboard-actions" style={{ marginTop: "30px" }}>
+        <button onClick={handleShareProgress} className="refresh-btn" disabled={sharing}>
+          {sharing ? "Generando link..." : "✨ Compartir Progreso"}
+        </button>
+        {shareLink && (
+          <div style={{ marginTop: "15px", fontSize: "0.9rem", color: "#333" }}>
+            <p>¡Tu link para compartir está listo!</p>
+            <a
+              href={shareLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#667eea", wordBreak: "break-all" }}
+            >
+              {shareLink}
+            </a>
+            {/* Optional: You can integrate react-share components here for direct sharing to social media */}
+            {/* For example, for WhatsApp: */}
+            {/* <div style={{ marginTop: "10px", display: "flex", gap: "10px", justifyContent: "center" }}>
+              <WhatsappShareButton url={shareLink} title="¡Mira mi progreso de hábitos!">
+                <WhatsappIcon size={32} round />
+              </WhatsappShareButton>
+            </div> */}
+          </div>
+        )}
+        {shareError && (
+          <div style={{ marginTop: "15px", fontSize: "0.9rem", color: "#dc3545" }}>
+            <p>{shareError}</p>
+          </div>
+        )}
+      </div>
       {/* Refresh Button */}
-      <div className="dashboard-actions">
+      <div className="dashboard-actions" style={{ marginTop: "20px" }}>
         <button onClick={fetchStats} className="refresh-btn">
           Actualizar Estadísticas
         </button>

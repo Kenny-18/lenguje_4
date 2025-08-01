@@ -1,0 +1,155 @@
+/* Achievements List Styles */
+.achievements-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.achievements-container h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.achievements-subtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0 0 30px 0;
+  text-align: center;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.achievement-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.achievement-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.15);
+}
+
+.achievement-badge {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.achievement-badge svg {
+  width: 100%;
+  height: 100%;
+}
+
+.achievement-details {
+  flex-grow: 1;
+}
+
+.achievement-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.achievement-description {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.achievement-date {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.achievement-habit {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin-left: 8px;
+  font-style: italic;
+}
+
+.no-achievements {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  color: #6b7280;
+  font-size: 1.125rem;
+  margin-top: 30px;
+}
+
+.no-achievements p {
+  margin: 10px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .achievements-container {
+    padding: 15px;
+  }
+
+  .achievements-container h2 {
+    font-size: 2rem;
+  }
+
+  .achievements-subtitle {
+    font-size: 1rem;
+  }
+
+  .achievements-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .achievement-card {
+    padding: 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .achievement-badge {
+    margin-bottom: 10px;
+  }
+
+  .achievement-name {
+    font-size: 1.125rem;
+  }
+
+  .achievement-description {
+    font-size: 0.875rem;
+  }
+
+  .achievement-habit {
+    display: block;
+    margin-left: 0;
+    margin-top: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .achievements-container h2 {
+    font-size: 1.75rem;
+  }
+}

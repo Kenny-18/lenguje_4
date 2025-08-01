@@ -5,7 +5,9 @@ import dotenv from "dotenv"
 import connectDB from "./db/connect.js"
 import habitRoutes from "./routes/habitRoutes.js"
 import statsRoutes from "./routes/statsRoutes.js"
-import googleRoutes from "./routes/googleRoutes.js" // ✅ Ya está
+import googleRoutes from "./routes/googleRoutes.js"
+import achievementRoutes from "./routes/achievementRoutes.js"
+import userRoutes from "./routes/userRoutes.js" // NEW: Import user routes
 
 // Configurar variables de entorno
 dotenv.config()
@@ -34,7 +36,9 @@ app.get("/", (req, res) => {
       health: "/api/health",
       habits: "/api/habits",
       stats: "/api/stats",
-      google: "/api/integrations/google", // New endpoint
+      google: "/api/integrations/google",
+      achievements: "/api/achievements",
+      users: "/api/users", // NEW: User preferences endpoint
     },
   })
 })
@@ -51,7 +55,9 @@ app.get("/api/health", (req, res) => {
 // Rutas de la API
 app.use("/api/habits", habitRoutes)
 app.use("/api/stats", statsRoutes)
-app.use("/api/integrations/google", googleRoutes) // New route
+app.use("/api/integrations/google", googleRoutes)
+app.use("/api/achievements", achievementRoutes)
+app.use("/api/users", userRoutes) // NEW: Use user routes
 
 // Middleware para rutas no encontradas
 app.use((req, res) => {
@@ -66,8 +72,11 @@ app.use((req, res) => {
       "DELETE /api/habits/:id",
       "GET /api/stats/overview",
       "GET /api/stats/habits/:id",
-      "GET /api/integrations/google/auth", // New route
-      "GET /api/integrations/google/callback", // New route
+      "GET /api/integrations/google/auth",
+      "GET /api/integrations/google/callback",
+      "GET /api/achievements",
+      "PUT /api/users/preferences", // NEW
+      "GET /api/users/preferences", // NEW
     ],
   })
 })
@@ -100,7 +109,9 @@ const startServer = async () => {
       console.log(`📝 API Habits: http://localhost:${PORT}/api/habits`)
       console.log(`📈 API Stats: http://localhost:${PORT}/api/stats`)
       console.log(`🔗 MongoDB conectado correctamente`)
-      console.log(`🔗 Google Calendar Integration: http://localhost:${PORT}/api/integrations/google/auth`) // New log
+      console.log(`🔗 Google Calendar Integration: http://localhost:${PORT}/api/integrations/google/auth`)
+      console.log(`🏆 API Achievements: http://localhost:${PORT}/api/achievements`)
+      console.log(`👤 API User Preferences: http://localhost:${PORT}/api/users/preferences`) // NEW log
     })
   } catch (error) {
     console.error("❌ Error al iniciar el servidor:", error.message)

@@ -5,7 +5,9 @@ import { useAuth } from "../contexts/AuthContext"
 import { useNavigate } from "react-router-dom"
 import HabitsList from "./HabitsList"
 import ProgressDashboard from "./ProgressDashboard"
-import GoogleAuthButton from "./GoogleAuthButton" // New import
+import GoogleAuthButton from "./GoogleAuthButton"
+import AchievementsList from "./AchievementsList"
+import ThemeToggle from "./ThemeToggle" // NEW: Import ThemeToggle
 import "../ProgressDashboard.css"
 
 const Dashboard = () => {
@@ -35,15 +37,14 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-          <div className="user-details">
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <h3>¡Hola, {currentUser?.displayName || "Usuario"}!</h3>
             <p>{currentUser?.email}</p>
           </div>
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          {" "}
-          {/* New wrapper div */}
-          <GoogleAuthButton /> {/* New button */}
+          <ThemeToggle /> {/* NEW: Add ThemeToggle */}
+          <GoogleAuthButton />
           <button onClick={handleLogout} className="logout-btn">
             Cerrar Sesión
           </button>
@@ -65,12 +66,19 @@ const Dashboard = () => {
           >
             📊 Progreso
           </button>
+          <button
+            className={`nav-tab ${activeTab === "achievements" ? "active" : ""}`}
+            onClick={() => setActiveTab("achievements")}
+          >
+            🏆 Logros
+          </button>
         </div>
       </nav>
 
       <main className="dashboard-content">
         {activeTab === "habits" && <HabitsList />}
         {activeTab === "progress" && <ProgressDashboard />}
+        {activeTab === "achievements" && <AchievementsList />}
       </main>
     </div>
   )

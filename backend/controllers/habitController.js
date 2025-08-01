@@ -1,13 +1,69 @@
 import Habit from "../models/Habit.js"
 
-// GET /api/habits - Obtener todos los hábitos del usuario autenticado
+// GET /api/habits - Obtener todos los hábitos del usuario autenticado con filtros
 export const getHabits = async (req, res) => {
   try {
-    // Filtrar hábitos solo del usuario autenticado
-    const habits = await Habit.find({ userId: req.user.uid }).sort({ createdAt: -1 })
+    const userId = req.user.uid
+    const { search, frequency, category, sortBy = "createdAt", sortOrder = "desc" } = req.query
 
-    res.status(200).json(habits)
+    // Construir filtro base
+    const filter = { userId }
+
+    // Filtro por frecuencia
+    if (frequency && frequency !== "all") {
+      filter.frequency = frequency
+    }
+
+    // Filtro por categoría (si se implementa en el futuro)
+    if (category && category !== "all") {
+      filter.category = category
+    }
+
+    let query
+
+    // Búsqueda por texto
+    if (search && search.trim()) {
+      // Usar búsqueda de texto de MongoDB
+      query = Habit.find(
+        {
+          ...filter,
+          $text: { $search: search.trim() },
+        },
+        {
+          score: { $meta: "textScore" },
+        },
+      ).sort({
+        score: { $meta: "textScore" },
+        [sortBy]: sortOrder === "desc" ? -1 : 1,
+      })
+    } else {
+      // Consulta normal sin búsqueda de texto
+      query = Habit.find(filter).sort({
+        [sortBy]: sortOrder === "desc" ? -1 : 1,
+      })
+    }
+
+    const habits = await query.exec()
+
+    // Estadísticas de la búsqueda
+    const totalHabits = await Habit.countDocuments({ userId })
+    const filteredCount = habits.length
+
+    res.status(200).json({
+      habits,
+      meta: {
+        total: totalHabits,
+        filtered: filteredCount,
+        hasFilters: !!(search || (frequency && frequency !== "all") || (category && category !== "all")),
+        filters: {
+          search: search || null,
+          frequency: frequency || null,
+          category: category || null,
+        },
+      },
+    })
   } catch (error) {
+    console.error("Error al obtener hábitos:", error)
     res.status(500).json({
       message: "Error al obtener hábitos",
       error: error.message,

@@ -51,6 +51,24 @@ const habitSchema = new mongoose.Schema(
   },
 )
 
+// Índice de texto para búsqueda
+habitSchema.index(
+  {
+    title: "text",
+    description: "text",
+  },
+  {
+    weights: {
+      title: 10,
+      description: 5,
+    },
+    name: "habit_text_index",
+  },
+)
+
+// Índice compuesto para optimizar filtros
+habitSchema.index({ userId: 1, frequency: 1, createdAt: -1 })
+
 const Habit = mongoose.model("Habit", habitSchema)
 
 export default Habit

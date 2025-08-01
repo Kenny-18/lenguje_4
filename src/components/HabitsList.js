@@ -5,6 +5,8 @@ import { useAuth } from "../contexts/AuthContext"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import axiosInstance from "../axiosInstance"
+import HabitsSearch from "./HabitsSearch"
+import "../HabitsSearch.css"
 
 const HabitsList = () => {
   const [habits, setHabits] = useState([])
@@ -32,55 +34,104 @@ const HabitsList = () => {
   })
   const [updating, setUpdating] = useState(false)
 
-  // Función para obtener hábitos del backend
-  const fetchHabits = useCallback(async () => {
-    if (!currentUser) {
-      setLoading(false)
-      return
-    }
+  // Estados para búsqueda y filtros
+  const [searchMeta, setSearchMeta] = useState({
+    total: 0,
+    filtered: 0,
+    hasFilters: false,
+    filters: {},
+  })
+  const [currentFilters, setCurrentFilters] = useState({
+    search: null,
+    frequency: null,
+  })
 
-    try {
-      setLoading(true)
-      const response = await axiosInstance.get("/habits")
-      setHabits(response.data)
-      setError(null)
-
-      // Verificar check-ins de hoy para cada hábito
-      const checkinPromises = response.data.map(async (habit) => {
-        try {
-          const checkinResponse = await axiosInstance.get(`/habits/${habit._id}/checkins/today`)
-          return {
-            habitId: habit._id,
-            hasCheckinToday: checkinResponse.data.hasCheckinToday,
-            checkin: checkinResponse.data.checkin,
-          }
-        } catch (err) {
-          console.error(`Error verificando check-in para hábito ${habit._id}:`, err)
-          return {
-            habitId: habit._id,
-            hasCheckinToday: false,
-            checkin: null,
-          }
-        }
-      })
-
-      const checkinResults = await Promise.all(checkinPromises)
-      const checkinMap = {}
-      checkinResults.forEach((result) => {
-        checkinMap[result.habitId] = result
-      })
-      setTodayCheckins(checkinMap)
-    } catch (err) {
-      if (err.response?.status === 401) {
-        setError("Sesión expirada. Por favor, inicia sesión nuevamente.")
-      } else {
-        setError("Error al cargar los hábitos: " + (err.response?.data?.message || err.message))
+  // Función para obtener hábitos del backend con filtros
+  const fetchHabits = useCallback(
+    async (filters = {}) => {
+      if (!currentUser) {
+        setLoading(false)
+        return
       }
-      console.error("Error fetching habits:", err)
-    } finally {
-      setLoading(false)
-    }
-  }, [currentUser])
+
+      try {
+        setLoading(true)
+
+        // Construir query parameters
+        const params = new URLSearchParams()
+        if (filters.search) params.append("search", filters.search)
+        if (filters.frequency) params.append("frequency", filters.frequency)
+
+        const queryString = params.toString()
+        const url = queryString ? `/habits?${queryString}` : "/habits"
+
+        const response = await axiosInstance.get(url)
+
+        // Manejar respuesta con metadata
+        if (response.data.habits) {
+          setHabits(response.data.habits)
+          setSearchMeta(response.data.meta)
+        } else {
+          // Compatibilidad con respuesta anterior
+          setHabits(response.data)
+          setSearchMeta({
+            total: response.data.length,
+            filtered: response.data.length,
+            hasFilters: false,
+            filters: {},
+          })
+        }
+
+        setError(null)
+
+        // Verificar check-ins de hoy para cada hábito
+        const habitsData = response.data.habits || response.data
+        const checkinPromises = habitsData.map(async (habit) => {
+          try {
+            const checkinResponse = await axiosInstance.get(`/habits/${habit._id}/checkins/today`)
+            return {
+              habitId: habit._id,
+              hasCheckinToday: checkinResponse.data.hasCheckinToday,
+              checkin: checkinResponse.data.checkin,
+            }
+          } catch (err) {
+            console.error(`Error verificando check-in para hábito ${habit._id}:`, err)
+            return {
+              habitId: habit._id,
+              hasCheckinToday: false,
+              checkin: null,
+            }
+          }
+        })
+
+        const checkinResults = await Promise.all(checkinPromises)
+        const checkinMap = {}
+        checkinResults.forEach((result) => {
+          checkinMap[result.habitId] = result
+        })
+        setTodayCheckins(checkinMap)
+      } catch (err) {
+        if (err.response?.status === 401) {
+          setError("Sesión expirada. Por favor, inicia sesión nuevamente.")
+        } else {
+          setError("Error al cargar los hábitos: " + (err.response?.data?.message || err.message))
+        }
+        console.error("Error fetching habits:", err)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [currentUser],
+  )
+
+  // Función para manejar cambios en filtros
+  const handleFiltersChange = useCallback(
+    (newFilters) => {
+      setCurrentFilters(newFilters)
+      fetchHabits(newFilters)
+    },
+    [fetchHabits],
+  )
 
   // Función para crear un nuevo hábito
   const createHabit = async (e) => {
@@ -279,6 +330,14 @@ const HabitsList = () => {
           {creating ? "Creando..." : "Crear Hábito"}
         </button>
       </form>
+
+      {/* Componente de búsqueda y filtros */}
+      <HabitsSearch
+        onFiltersChange={handleFiltersChange}
+        totalHabits={searchMeta.total}
+        filteredCount={searchMeta.filtered}
+        currentFilters={currentFilters}
+      />
 
       {/* Lista de hábitos */}
       {habits.length === 0 ? (

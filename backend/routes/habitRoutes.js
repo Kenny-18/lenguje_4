@@ -1,6 +1,7 @@
 import express from "express"
 import { getHabits, createHabit, updateHabit, deleteHabit, getHabitById } from "../controllers/habitController.js"
 import { authenticateUser } from "../middleware/auth.js"
+import checkinRoutes from "./checkinRoutes.js"
 
 const router = express.Router()
 
@@ -12,6 +13,9 @@ router.use((req, res, next) => {
 
 // Aplicar autenticación a todas las rutas de hábitos
 router.use(authenticateUser)
+
+// Rutas anidadas para check-ins
+router.use("/:id/checkins", checkinRoutes)
 
 // Rutas para hábitos (todas requieren autenticación)
 router.get("/", getHabits) // GET /api/habits

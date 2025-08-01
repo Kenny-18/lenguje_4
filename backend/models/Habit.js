@@ -25,15 +25,29 @@ const habitSchema = new mongoose.Schema(
     userId: {
       type: String,
       required: [true, "El ID del usuario es requerido"],
-      index: true, // Agregar índice para mejorar las consultas
+      index: true,
     },
     userEmail: {
       type: String,
       required: [true, "El email del usuario es requerido"],
     },
+    streakCurrent: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    streakBest: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    lastCheckinDate: {
+      type: Date,
+      default: null,
+    },
   },
   {
-    timestamps: true, // Agrega createdAt y updatedAt automáticamente
+    timestamps: true,
   },
 )
 

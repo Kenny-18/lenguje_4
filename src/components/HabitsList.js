@@ -1,7 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useAuth } from "../contexts/AuthContext"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 import axiosInstance from "../axiosInstance"
 
 const HabitsList = () => {
@@ -9,6 +11,8 @@ const HabitsList = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [creating, setCreating] = useState(false)
+  const [checkingIn, setCheckingIn] = useState({})
+  const [todayCheckins, setTodayCheckins] = useState({})
 
   const { currentUser } = useAuth()
 
@@ -19,8 +23,17 @@ const HabitsList = () => {
     frequency: "daily",
   })
 
+  // Estado para manejar la edición
+  const [editingHabit, setEditingHabit] = useState(null)
+  const [editFormData, setEditFormData] = useState({
+    title: "",
+    description: "",
+    frequency: "daily",
+  })
+  const [updating, setUpdating] = useState(false)
+
   // Función para obtener hábitos del backend
-  const fetchHabits = async () => {
+  const fetchHabits = useCallback(async () => {
     if (!currentUser) {
       setLoading(false)
       return
@@ -31,6 +44,32 @@ const HabitsList = () => {
       const response = await axiosInstance.get("/habits")
       setHabits(response.data)
       setError(null)
+
+      // Verificar check-ins de hoy para cada hábito
+      const checkinPromises = response.data.map(async (habit) => {
+        try {
+          const checkinResponse = await axiosInstance.get(`/habits/${habit._id}/checkins/today`)
+          return {
+            habitId: habit._id,
+            hasCheckinToday: checkinResponse.data.hasCheckinToday,
+            checkin: checkinResponse.data.checkin,
+          }
+        } catch (err) {
+          console.error(`Error verificando check-in para hábito ${habit._id}:`, err)
+          return {
+            habitId: habit._id,
+            hasCheckinToday: false,
+            checkin: null,
+          }
+        }
+      })
+
+      const checkinResults = await Promise.all(checkinPromises)
+      const checkinMap = {}
+      checkinResults.forEach((result) => {
+        checkinMap[result.habitId] = result
+      })
+      setTodayCheckins(checkinMap)
     } catch (err) {
       if (err.response?.status === 401) {
         setError("Sesión expirada. Por favor, inicia sesión nuevamente.")
@@ -41,7 +80,7 @@ const HabitsList = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentUser])
 
   // Función para crear un nuevo hábito
   const createHabit = async (e) => {
@@ -54,6 +93,16 @@ const HabitsList = () => {
       setHabits([response.data, ...habits])
       setFormData({ title: "", description: "", frequency: "daily" })
       setError(null)
+
+      // Inicializar check-in status para el nuevo hábito
+      setTodayCheckins((prev) => ({
+        ...prev,
+        [response.data._id]: {
+          habitId: response.data._id,
+          hasCheckinToday: false,
+          checkin: null,
+        },
+      }))
     } catch (err) {
       if (err.response?.status === 401) {
         setError("Sesión expirada. Por favor, inicia sesión nuevamente.")
@@ -65,6 +114,51 @@ const HabitsList = () => {
     }
   }
 
+  // Función para hacer check-in
+  const handleCheckin = async (habitId) => {
+    try {
+      setCheckingIn((prev) => ({ ...prev, [habitId]: true }))
+
+      const response = await axiosInstance.post(`/habits/${habitId}/checkins`)
+
+      // Actualizar el estado local
+      setTodayCheckins((prev) => ({
+        ...prev,
+        [habitId]: {
+          habitId,
+          hasCheckinToday: true,
+          checkin: response.data.checkin,
+        },
+      }))
+
+      // Actualizar el hábito con las nuevas rachas
+      setHabits((prevHabits) =>
+        prevHabits.map((habit) =>
+          habit._id === habitId
+            ? {
+                ...habit,
+                streakCurrent: response.data.habit.streakCurrent,
+                streakBest: response.data.habit.streakBest,
+                lastCheckinDate: response.data.habit.lastCheckinDate,
+              }
+            : habit,
+        ),
+      )
+
+      setError(null)
+    } catch (err) {
+      if (err.response?.status === 400) {
+        setError("Ya realizaste el check-in de hoy para este hábito")
+      } else if (err.response?.status === 401) {
+        setError("Sesión expirada. Por favor, inicia sesión nuevamente.")
+      } else {
+        setError("Error al realizar check-in: " + (err.response?.data?.message || err.message))
+      }
+    } finally {
+      setCheckingIn((prev) => ({ ...prev, [habitId]: false }))
+    }
+  }
+
   // Función para eliminar un hábito
   const deleteHabit = async (id) => {
     if (!window.confirm("¿Estás seguro de eliminar este hábito?")) return
@@ -72,6 +166,12 @@ const HabitsList = () => {
     try {
       await axiosInstance.delete(`/habits/${id}`)
       setHabits(habits.filter((habit) => habit._id !== id))
+      // Limpiar check-in status
+      setTodayCheckins((prev) => {
+        const newState = { ...prev }
+        delete newState[id]
+        return newState
+      })
     } catch (err) {
       if (err.response?.status === 401) {
         setError("Sesión expirada. Por favor, inicia sesión nuevamente.")
@@ -83,12 +183,56 @@ const HabitsList = () => {
     }
   }
 
+  // Función para iniciar la edición de un hábito
+  const startEditing = (habit) => {
+    setEditingHabit(habit._id)
+    setEditFormData({
+      title: habit.title,
+      description: habit.description || "",
+      frequency: habit.frequency,
+    })
+  }
+
+  // Función para cancelar la edición
+  const cancelEditing = () => {
+    setEditingHabit(null)
+    setEditFormData({ title: "", description: "", frequency: "daily" })
+  }
+
+  // Función para actualizar un hábito
+  const updateHabit = async (id) => {
+    if (!editFormData.title.trim()) return
+
+    try {
+      setUpdating(true)
+      const response = await axiosInstance.put(`/habits/${id}`, editFormData)
+
+      // Actualizar el hábito en la lista local
+      setHabits(habits.map((habit) => (habit._id === id ? response.data : habit)))
+
+      // Limpiar el estado de edición
+      setEditingHabit(null)
+      setEditFormData({ title: "", description: "", frequency: "daily" })
+      setError(null)
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setError("Sesión expirada. Por favor, inicia sesión nuevamente.")
+      } else if (err.response?.status === 404) {
+        setError("Hábito no encontrado o no tienes permisos para modificarlo.")
+      } else {
+        setError("Error al actualizar hábito: " + (err.response?.data?.message || err.message))
+      }
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   // useEffect para cargar datos cuando el usuario esté autenticado
   useEffect(() => {
     if (currentUser) {
       fetchHabits()
     }
-  }, [currentUser])
+  }, [currentUser, fetchHabits])
 
   if (!currentUser) {
     return <div className="loading">Verificando autenticación...</div>
@@ -146,17 +290,94 @@ const HabitsList = () => {
         <ul className="habits-list">
           {habits.map((habit) => (
             <li key={habit._id} className="habit-item">
-              <div className="habit-content">
-                <h3>{habit.title}</h3>
-                {habit.description && <p>{habit.description}</p>}
-                <div className="habit-meta">
-                  <span className="frequency">Frecuencia: {habit.frequency}</span>
-                  <span className="created-date">Creado: {new Date(habit.createdAt).toLocaleDateString()}</span>
+              {editingHabit === habit._id ? (
+                // Formulario de edición inline
+                <div className="habit-edit-form">
+                  <input
+                    type="text"
+                    value={editFormData.title}
+                    onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                    placeholder="Título del hábito"
+                    className="edit-input"
+                  />
+                  <textarea
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                    placeholder="Descripción (opcional)"
+                    className="edit-textarea"
+                  />
+                  <select
+                    value={editFormData.frequency}
+                    onChange={(e) => setEditFormData({ ...editFormData, frequency: e.target.value })}
+                    className="edit-select"
+                  >
+                    <option value="daily">Diario</option>
+                    <option value="weekly">Semanal</option>
+                    <option value="monthly">Mensual</option>
+                  </select>
+                  <div className="edit-buttons">
+                    <button onClick={() => updateHabit(habit._id)} className="save-btn" disabled={updating}>
+                      {updating ? "Guardando..." : "Guardar"}
+                    </button>
+                    <button onClick={cancelEditing} className="cancel-btn" disabled={updating}>
+                      Cancelar
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <button onClick={() => deleteHabit(habit._id)} className="delete-btn">
-                Eliminar
-              </button>
+              ) : (
+                // Vista normal del hábito
+                <>
+                  <div className="habit-content">
+                    <h3>{habit.title}</h3>
+                    {habit.description && <p>{habit.description}</p>}
+                    <div className="habit-meta">
+                      <span className="frequency">Frecuencia: {habit.frequency}</span>
+                      <span className="created-date">Creado: {new Date(habit.createdAt).toLocaleDateString()}</span>
+                      {habit.streakCurrent > 0 && (
+                        <span className="streak-current">Racha actual: {habit.streakCurrent} días</span>
+                      )}
+                      {habit.streakBest > 0 && (
+                        <span className="streak-best">Mejor racha: {habit.streakBest} días</span>
+                      )}
+                      {habit.lastCheckinDate && (
+                        <span className="last-checkin">
+                          Último check-in: {format(new Date(habit.lastCheckinDate), "dd/MM/yyyy", { locale: es })}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="habit-actions">
+                    {/* Botón de Check-in */}
+                    {habit.frequency === "daily" && (
+                      <button
+                        onClick={() => handleCheckin(habit._id)}
+                        className={`checkin-btn ${
+                          todayCheckins[habit._id]?.hasCheckinToday ? "checkin-completed" : ""
+                        }`}
+                        disabled={
+                          todayCheckins[habit._id]?.hasCheckinToday || checkingIn[habit._id] || editingHabit !== null
+                        }
+                      >
+                        {checkingIn[habit._id]
+                          ? "..."
+                          : todayCheckins[habit._id]?.hasCheckinToday
+                            ? "✅ Completado"
+                            : "✔ Hoy"}
+                      </button>
+                    )}
+                    <button onClick={() => startEditing(habit)} className="edit-btn" disabled={editingHabit !== null}>
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => deleteHabit(habit._id)}
+                      className="delete-btn"
+                      disabled={editingHabit !== null}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </>
+              )}
             </li>
           ))}
         </ul>

@@ -4,6 +4,7 @@ import morgan from "morgan"
 import dotenv from "dotenv"
 import connectDB from "./db/connect.js"
 import habitRoutes from "./routes/habitRoutes.js"
+import statsRoutes from "./routes/statsRoutes.js"
 
 // Configurar variables de entorno
 dotenv.config()
@@ -31,6 +32,7 @@ app.get("/", (req, res) => {
     endpoints: {
       health: "/api/health",
       habits: "/api/habits",
+      stats: "/api/stats",
     },
   })
 })
@@ -46,8 +48,9 @@ app.get("/api/health", (req, res) => {
 
 // Rutas de la API
 app.use("/api/habits", habitRoutes)
+app.use("/api/stats", statsRoutes)
 
-// Middleware para rutas no encontradas - CORREGIDO
+// Middleware para rutas no encontradas
 app.use((req, res) => {
   res.status(404).json({
     message: `Ruta ${req.originalUrl} no encontrada`,
@@ -58,6 +61,8 @@ app.use((req, res) => {
       "POST /api/habits",
       "PUT /api/habits/:id",
       "DELETE /api/habits/:id",
+      "GET /api/stats/overview",
+      "GET /api/stats/habits/:id",
     ],
   })
 })
@@ -88,6 +93,7 @@ const startServer = async () => {
       console.log(`🌐 URL base: http://localhost:${PORT}`)
       console.log(`📊 Health check: http://localhost:${PORT}/api/health`)
       console.log(`📝 API Habits: http://localhost:${PORT}/api/habits`)
+      console.log(`📈 API Stats: http://localhost:${PORT}/api/stats`)
       console.log(`📚 Documentación: http://localhost:${PORT}`)
       console.log(`🔗 MongoDB conectado correctamente`)
     })

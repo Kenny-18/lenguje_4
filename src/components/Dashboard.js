@@ -1,12 +1,16 @@
 "use client"
 
+import { useState } from "react"
 import { useAuth } from "../contexts/AuthContext"
 import { useNavigate } from "react-router-dom"
 import HabitsList from "./HabitsList"
+import ProgressDashboard from "./ProgressDashboard"
+import "../ProgressDashboard.css"
 
 const Dashboard = () => {
   const { currentUser, logout } = useAuth()
   const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState("habits")
 
   const handleLogout = async () => {
     try {
@@ -40,8 +44,27 @@ const Dashboard = () => {
         </button>
       </header>
 
+      {/* Navigation Tabs */}
+      <nav className="dashboard-nav">
+        <div className="nav-container">
+          <button
+            className={`nav-tab ${activeTab === "habits" ? "active" : ""}`}
+            onClick={() => setActiveTab("habits")}
+          >
+            📝 Mis Hábitos
+          </button>
+          <button
+            className={`nav-tab ${activeTab === "progress" ? "active" : ""}`}
+            onClick={() => setActiveTab("progress")}
+          >
+            📊 Progreso
+          </button>
+        </div>
+      </nav>
+
       <main className="dashboard-content">
-        <HabitsList />
+        {activeTab === "habits" && <HabitsList />}
+        {activeTab === "progress" && <ProgressDashboard />}
       </main>
     </div>
   )

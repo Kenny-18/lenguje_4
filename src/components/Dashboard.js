@@ -8,7 +8,8 @@ import ProgressDashboard from "./ProgressDashboard"
 import GoogleAuthButton from "./GoogleAuthButton"
 import AchievementsList from "./AchievementsList"
 import ThemeToggle from "./ThemeToggle"
-import DailySuggestionCard from "./DailySuggestionCard" // NEW: Import DailySuggestionCard
+import DailySuggestionCard from "./DailySuggestionCard"
+import MoodTracker from "./MoodTracker" // NEW: Import MoodTracker
 import "../ProgressDashboard.css"
 
 const Dashboard = () => {
@@ -73,14 +74,18 @@ const Dashboard = () => {
           >
             🏆 Logros
           </button>
+          <button className={`nav-tab ${activeTab === "mood" ? "active" : ""}`} onClick={() => setActiveTab("mood")}>
+            😊 Estado de Ánimo
+          </button>
         </div>
       </nav>
 
       <main className="dashboard-content">
-        <DailySuggestionCard /> {/* NEW: Add DailySuggestionCard here */}
+        <DailySuggestionCard />
         {activeTab === "habits" && <HabitsList />}
         {activeTab === "progress" && <ProgressDashboard />}
         {activeTab === "achievements" && <AchievementsList />}
+        {activeTab === "mood" && <MoodTracker />} {/* NEW: Render MoodTracker */}
       </main>
     </div>
   )

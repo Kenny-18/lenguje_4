@@ -7,8 +7,10 @@ import habitRoutes from "./routes/habitRoutes.js"
 import statsRoutes from "./routes/statsRoutes.js"
 import googleRoutes from "./routes/googleRoutes.js"
 import achievementRoutes from "./routes/achievementRoutes.js"
-import userRoutes from "./routes/userRoutes.js" // NEW: Import user routes
-import aiRoutes from "./routes/aiRoutes.js" // NEW: Import AI routes
+import userRoutes from "./routes/userRoutes.js"
+import aiRoutes from "./routes/aiRoutes.js"
+import shareRoutes from "./routes/shareRoutes.js" // NEW: Import share routes
+import moodRoutes from "./routes/moodRoutes.js" // NEW: Import mood routes
 
 // Configurar variables de entorno
 dotenv.config()
@@ -40,7 +42,9 @@ app.get("/", (req, res) => {
       google: "/api/integrations/google",
       achievements: "/api/achievements",
       users: "/api/users",
-      ai: "/api/ai", // NEW: AI endpoint
+      ai: "/api/ai",
+      share: "/api/share", // NEW
+      moods: "/api/moods", // NEW
     },
   })
 })
@@ -60,7 +64,9 @@ app.use("/api/stats", statsRoutes)
 app.use("/api/integrations/google", googleRoutes)
 app.use("/api/achievements", achievementRoutes)
 app.use("/api/users", userRoutes)
-app.use("/api/ai", aiRoutes) // NEW: Use AI routes
+app.use("/api/ai", aiRoutes)
+app.use("/api/share", shareRoutes) // NEW: Use share routes
+app.use("/api/moods", moodRoutes) // NEW: Use mood routes
 
 // Middleware para rutas no encontradas
 app.use((req, res) => {
@@ -80,7 +86,11 @@ app.use((req, res) => {
       "GET /api/achievements",
       "PUT /api/users/preferences",
       "GET /api/users/preferences",
-      "GET /api/ai/suggest", // NEW
+      "GET /api/ai/suggest",
+      "POST /api/share", // NEW
+      "GET /share/:token", // NEW
+      "POST /api/moods", // NEW
+      "GET /api/moods", // NEW
     ],
   })
 })
@@ -116,7 +126,9 @@ const startServer = async () => {
       console.log(`🔗 Google Calendar Integration: http://localhost:${PORT}/api/integrations/google/auth`)
       console.log(`🏆 API Achievements: http://localhost:${PORT}/api/achievements`)
       console.log(`👤 API User Preferences: http://localhost:${PORT}/api/users/preferences`)
-      console.log(`🧠 API AI Suggestions: http://localhost:${PORT}/api/ai/suggest`) // NEW log
+      console.log(`🧠 API AI Suggestions: http://localhost:${PORT}/api/ai/suggest`)
+      console.log(`🔗 API Share: http://localhost:${PORT}/api/share`) // NEW log
+      console.log(`😊 API Moods: http://localhost:${PORT}/api/moods`) // NEW log
     })
   } catch (error) {
     console.error("❌ Error al iniciar el servidor:", error.message)

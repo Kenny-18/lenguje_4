@@ -23,11 +23,10 @@ const DailySuggestionCard = () => {
       setError(null)
       
       // Crear una instancia de axios con timeout específico para IA
-      const aiRequest = axiosInstance.get("/ai/suggest", {
+      const response = await axiosInstance.get("/ai/suggest", {
         timeout: 25000, // 25 segundos específico para IA
       })
       
-      const response = await aiRequest
       setSuggestion(response.data)
       setRetryCount(0) // Reset retry count on success
     } catch (err) {
@@ -47,10 +46,12 @@ const DailySuggestionCard = () => {
       
       // Auto-retry hasta 2 veces con delay
       if (retryCount < 2 && (err.code === 'ECONNABORTED' || err.response?.status >= 500)) {
+        const nextRetryCount = retryCount + 1
+        setRetryCount(nextRetryCount) // ✅ Actualizar ANTES del setTimeout
+        
         setTimeout(() => {
-          setRetryCount(prev => prev + 1)
           fetchSuggestion()
-        }, 3000 * (retryCount + 1)) // Delay incremental: 3s, 6s
+        }, 3000 * nextRetryCount) // Delay incremental: 3s, 6s
       }
     } finally {
       setLoading(false)
@@ -61,10 +62,11 @@ const DailySuggestionCard = () => {
     if (currentUser) {
       fetchSuggestion()
     }
-  }, [currentUser, fetchSuggestion])
+  }, [currentUser]) // ✅ Removido retryCount de las dependencias para evitar bucle infinito
 
   const handleManualRetry = () => {
     setRetryCount(0)
+    setError(null)
     fetchSuggestion()
   }
 

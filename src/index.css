@@ -138,7 +138,9 @@ code {
 
 .habits-container,
 .achievements-container,
-.progress-dashboard {
+.progress-dashboard,
+.mood-tracker-container {
+  /* NEW: Add mood-tracker-container */
   background-color: var(--background-color); /* Ensure container background matches body */
 }
 
@@ -246,12 +248,12 @@ code {
 }
 
 .refresh-btn {
-  background: var(--button-primary-bg);
+  background: linear-gradient(135deg, var(--nav-tab-active-color) 0%, var(--button-secondary-hover-bg) 100%);
   color: white;
 }
 
 .refresh-btn:hover {
-  background: var(--button-primary-hover-bg);
+  box-shadow: 0 8px 15px var(--shadow-color);
 }
 
 /* Estilos para la edición de hábitos */

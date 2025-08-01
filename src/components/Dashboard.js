@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext"
 import { useNavigate } from "react-router-dom"
 import HabitsList from "./HabitsList"
 import ProgressDashboard from "./ProgressDashboard"
+import GoogleAuthButton from "./GoogleAuthButton" // New import
 import "../ProgressDashboard.css"
 
 const Dashboard = () => {
@@ -39,9 +40,14 @@ const Dashboard = () => {
             <p>{currentUser?.email}</p>
           </div>
         </div>
-        <button onClick={handleLogout} className="logout-btn">
-          Cerrar Sesión
-        </button>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          {" "}
+          {/* New wrapper div */}
+          <GoogleAuthButton /> {/* New button */}
+          <button onClick={handleLogout} className="logout-btn">
+            Cerrar Sesión
+          </button>
+        </div>
       </header>
 
       {/* Navigation Tabs */}

@@ -1,5 +1,12 @@
 import express from "express"
-import { getHabits, createHabit, updateHabit, deleteHabit, getHabitById } from "../controllers/habitController.js"
+import {
+  getHabits,
+  createHabit,
+  updateHabit,
+  deleteHabit,
+  getHabitById,
+  syncHabitToGoogleCalendar,
+} from "../controllers/habitController.js"
 import { authenticateUser } from "../middleware/auth.js"
 import checkinRoutes from "./checkinRoutes.js"
 
@@ -23,5 +30,6 @@ router.post("/", createHabit) // POST /api/habits
 router.get("/:id", getHabitById) // GET /api/habits/:id
 router.put("/:id", updateHabit) // PUT /api/habits/:id
 router.delete("/:id", deleteHabit) // DELETE /api/habits/:id
+router.post("/:id/sync-calendar", syncHabitToGoogleCalendar) // New route
 
 export default router

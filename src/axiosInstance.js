@@ -1,10 +1,10 @@
 import axios from "axios"
-import { auth } from "./firebase/config"
+import { auth } from "./firebase/config" // ✅ Corregido: agregar /config
 
 // Configuración base de Axios
 const axiosInstance = axios.create({
   baseURL: "http://localhost:3000/api", // Backend en puerto 3000
-  timeout: 10000,
+  timeout: 30000, // ✅ Aumentado de 10s a 30s
 })
 
 // Interceptor para requests - agregar token de autenticación automáticamente

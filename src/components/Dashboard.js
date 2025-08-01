@@ -6,7 +6,9 @@ import { useNavigate } from "react-router-dom"
 import HabitsList from "./HabitsList"
 import ProgressDashboard from "./ProgressDashboard"
 import GoogleAuthButton from "./GoogleAuthButton"
-import AchievementsList from "./AchievementsList" // New import
+import AchievementsList from "./AchievementsList"
+import ThemeToggle from "./ThemeToggle"
+import DailySuggestionCard from "./DailySuggestionCard" // NEW: Import DailySuggestionCard
 import "../ProgressDashboard.css"
 
 const Dashboard = () => {
@@ -42,9 +44,8 @@ const Dashboard = () => {
           </div>
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          {" "}
-          {/* New wrapper div */}
-          <GoogleAuthButton /> {/* New button */}
+          <ThemeToggle />
+          <GoogleAuthButton />
           <button onClick={handleLogout} className="logout-btn">
             Cerrar Sesión
           </button>
@@ -67,7 +68,7 @@ const Dashboard = () => {
             📊 Progreso
           </button>
           <button
-            className={`nav-tab ${activeTab === "achievements" ? "active" : ""}`} // New tab
+            className={`nav-tab ${activeTab === "achievements" ? "active" : ""}`}
             onClick={() => setActiveTab("achievements")}
           >
             🏆 Logros
@@ -76,9 +77,10 @@ const Dashboard = () => {
       </nav>
 
       <main className="dashboard-content">
+        <DailySuggestionCard /> {/* NEW: Add DailySuggestionCard here */}
         {activeTab === "habits" && <HabitsList />}
         {activeTab === "progress" && <ProgressDashboard />}
-        {activeTab === "achievements" && <AchievementsList />} {/* New content */}
+        {activeTab === "achievements" && <AchievementsList />}
       </main>
     </div>
   )

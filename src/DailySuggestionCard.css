@@ -1,0 +1,113 @@
+/* Daily Suggestion Card Styles */
+.daily-suggestion-card {
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%); /* Light blue gradient */
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #80deea;
+  text-align: center;
+  color: #004d40; /* Dark teal text */
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.3s ease;
+}
+
+html.dark .daily-suggestion-card {
+  background: linear-gradient(135deg, #263238 0%, #37474f 100%); /* Darker gradient */
+  border-color: #455a64;
+  color: #eceff1; /* Light text */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.daily-suggestion-card.loading,
+.daily-suggestion-card.error,
+.daily-suggestion-card.no-suggestion {
+  background: var(--card-background); /* Use theme's card background */
+  border: 1px solid var(--border-color);
+  color: var(--text-color-primary);
+  box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.daily-suggestion-card.error {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border-color: var(--error-text);
+}
+
+.suggestion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.suggestion-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #004d40; /* Dark teal */
+}
+
+html.dark .suggestion-header h3 {
+  color: #80deea; /* Light blue for dark theme */
+}
+
+.refresh-suggestion-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #00796b; /* Medium teal */
+  transition: transform 0.2s ease;
+}
+
+html.dark .refresh-suggestion-btn {
+  color: #80deea;
+}
+
+.refresh-suggestion-btn:hover {
+  transform: rotate(30deg);
+}
+
+.suggestion-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #004d40; /* Dark teal */
+}
+
+html.dark .suggestion-title {
+  color: #e0f7fa; /* Light blue for dark theme */
+}
+
+.suggestion-reason {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #00695c; /* Slightly lighter teal */
+}
+
+html.dark .suggestion-reason {
+  color: #b2ebf2; /* Lighter blue for dark theme */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .daily-suggestion-card {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .suggestion-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .suggestion-title {
+    font-size: 1.1rem;
+  }
+
+  .suggestion-reason {
+    font-size: 0.9rem;
+  }
+}

@@ -7,7 +7,8 @@ import habitRoutes from "./routes/habitRoutes.js"
 import statsRoutes from "./routes/statsRoutes.js"
 import googleRoutes from "./routes/googleRoutes.js"
 import achievementRoutes from "./routes/achievementRoutes.js"
-import shareRoutes from "./routes/shareRoutes.js" // NEW
+import userRoutes from "./routes/userRoutes.js" // NEW: Import user routes
+import aiRoutes from "./routes/aiRoutes.js" // NEW: Import AI routes
 
 // Configurar variables de entorno
 dotenv.config()
@@ -23,7 +24,7 @@ app.use(
   }),
 )
 
-app.use(express.json({ limit: "10mb" })) // Ensure it can handle large base64 images
+app.use(express.json({ limit: "10mb" }))
 app.use(express.urlencoded({ extended: true }))
 app.use(morgan("combined"))
 
@@ -38,8 +39,8 @@ app.get("/", (req, res) => {
       stats: "/api/stats",
       google: "/api/integrations/google",
       achievements: "/api/achievements",
-      share: "/api/share", // NEW
-      publicShare: "/share/:token", // NEW
+      users: "/api/users",
+      ai: "/api/ai", // NEW: AI endpoint
     },
   })
 })
@@ -58,10 +59,8 @@ app.use("/api/habits", habitRoutes)
 app.use("/api/stats", statsRoutes)
 app.use("/api/integrations/google", googleRoutes)
 app.use("/api/achievements", achievementRoutes)
-app.use("/api/share", shareRoutes) // NEW: for creating share links (authenticated)
-
-// NEW: Public route for shared progress (no /api prefix)
-app.use("/share", shareRoutes) // This will handle GET /share/:token
+app.use("/api/users", userRoutes)
+app.use("/api/ai", aiRoutes) // NEW: Use AI routes
 
 // Middleware para rutas no encontradas
 app.use((req, res) => {
@@ -79,8 +78,9 @@ app.use((req, res) => {
       "GET /api/integrations/google/auth",
       "GET /api/integrations/google/callback",
       "GET /api/achievements",
-      "POST /api/share", // NEW
-      "GET /share/:token", // NEW
+      "PUT /api/users/preferences",
+      "GET /api/users/preferences",
+      "GET /api/ai/suggest", // NEW
     ],
   })
 })
@@ -115,8 +115,8 @@ const startServer = async () => {
       console.log(`🔗 MongoDB conectado correctamente`)
       console.log(`🔗 Google Calendar Integration: http://localhost:${PORT}/api/integrations/google/auth`)
       console.log(`🏆 API Achievements: http://localhost:${PORT}/api/achievements`)
-      console.log(`🔗 API Share: http://localhost:${PORT}/api/share`) // NEW
-      console.log(`🌐 Public Share Links: http://localhost:${PORT}/share/:token`) // NEW
+      console.log(`👤 API User Preferences: http://localhost:${PORT}/api/users/preferences`)
+      console.log(`🧠 API AI Suggestions: http://localhost:${PORT}/api/ai/suggest`) // NEW log
     })
   } catch (error) {
     console.error("❌ Error al iniciar el servidor:", error.message)

@@ -1,13 +1,574 @@
+/* src/index.css */
+
+/* Base variables for light theme */
+:root {
+  --background-color: #f8f9fa;
+  --text-color-primary: #1f2937;
+  --text-color-secondary: #6b7280;
+  --card-background: white;
+  --border-color: #e5e7eb;
+  --header-background: white;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --input-background: white;
+  --input-border: #ddd;
+  --button-primary-bg: #28a745;
+  --button-primary-hover-bg: #218838;
+  --button-secondary-bg: #007bff;
+  --button-secondary-hover-bg: #0056b3;
+  --button-danger-bg: #dc3545;
+  --button-danger-hover-bg: #c82333;
+  --nav-tab-color: #6b7280;
+  --nav-tab-hover-bg: #f9fafb;
+  --nav-tab-active-color: #3b82f6;
+  --nav-tab-active-border: #3b82f6;
+  --nav-tab-active-bg: #f8faff;
+  --error-bg: #ffebee;
+  --error-text: #c62828;
+  --success-bg: #efe;
+  --success-text: #363;
+  --kpi-primary-border: #3b82f6;
+  --kpi-success-border: #10b981;
+  --kpi-info-border: #06b6d4;
+  --kpi-warning-border: #f59e0b;
+  --kpi-value-color: #1f2937;
+  --kpi-description-color: #9ca3af;
+  --stat-item-bg: #f9fafb;
+  --stat-item-border: #e5e7eb;
+  --stat-label-color: #6b7280;
+  --stat-value-color: #1f2937;
+  --no-data-color: #6b7280;
+  --no-data-bg: white;
+  --search-bg: white;
+  --search-border: #e5e7eb;
+  --search-icon-color: #9ca3af;
+  --search-clear-btn-color: #9ca3af;
+  --search-clear-btn-hover-bg: #f3f4f6;
+  --filter-label-color: #374151;
+  --filter-pill-bg: #eff6ff;
+  --filter-pill-border: #bfdbfe;
+  --filter-pill-label-color: #1e40af;
+  --filter-pill-value-color: #1e3a8a;
+  --filter-pill-remove-color: #3b82f6;
+  --filter-pill-remove-hover-bg: #dbeafe;
+  --no-results-bg: #fef3c7;
+  --no-results-border: #fbbf24;
+  --no-results-text: #92400e;
+}
+
+/* Dark theme variables */
+html.dark {
+  --background-color: #1a202c; /* Dark background */
+  --text-color-primary: #e2e8f0; /* Light text */
+  --text-color-secondary: #a0aec0;
+  --card-background: #2d3748; /* Darker card background */
+  --border-color: #4a5568;
+  --header-background: #2d3748;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --input-background: #4a5568;
+  --input-border: #667eea; /* A bit more vibrant border */
+  --button-primary-bg: #38a169; /* Green */
+  --button-primary-hover-bg: #2f855a;
+  --button-secondary-bg: #4299e1; /* Blue */
+  --button-secondary-hover-bg: #3182ce;
+  --button-danger-bg: #e53e3e; /* Red */
+  --button-danger-hover-bg: #c53030;
+  --nav-tab-color: #a0aec0;
+  --nav-tab-hover-bg: #4a5568;
+  --nav-tab-active-color: #63b3ed;
+  --nav-tab-active-border: #63b3ed;
+  --nav-tab-active-bg: #2d3748;
+  --error-bg: #fed7d7;
+  --error-text: #c53030;
+  --success-bg: #c6f6d5;
+  --success-text: #2f855a;
+  --kpi-primary-border: #63b3ed;
+  --kpi-success-border: #48bb78;
+  --kpi-info-border: #4fd1c5;
+  --kpi-warning-border: #f6ad55;
+  --kpi-value-color: #e2e8f0;
+  --kpi-description-color: #a0aec0;
+  --stat-item-bg: #4a5568;
+  --stat-item-border: #667eea;
+  --stat-label-color: #a0aec0;
+  --stat-value-color: #e2e8f0;
+  --no-data-color: #a0aec0;
+  --no-data-bg: #2d3748;
+  --search-bg: #2d3748;
+  --search-border: #4a5568;
+  --search-icon-color: #a0aec0;
+  --search-clear-btn-color: #a0aec0;
+  --search-clear-btn-hover-bg: #4a5568;
+  --filter-label-color: #e2e8f0;
+  --filter-pill-bg: #4a5568;
+  --filter-pill-border: #63b3ed;
+  --filter-pill-label-color: #e2e8f0;
+  --filter-pill-value-color: #e2e8f0;
+  --filter-pill-remove-color: #63b3ed;
+  --filter-pill-remove-hover-bg: #4299e1;
+  --no-results-bg: #4a5568;
+  --no-results-border: #f6ad55;
+  --no-results-text: #f6ad55;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background-color); /* Apply theme variable */
+  color: var(--text-color-primary); /* Apply theme variable */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+/* Apply theme variables to existing components */
+.App {
+  background-color: var(--background-color);
+  color: var(--text-color-primary);
+}
+
+.App-header {
+  background-color: var(--header-background);
+  color: var(--text-color-primary);
+}
+
+.habits-container,
+.achievements-container,
+.progress-dashboard {
+  background-color: var(--background-color); /* Ensure container background matches body */
+}
+
+.user-info {
+  color: var(--text-color-secondary);
+}
+
+/* Dashboard Navigation */
+.dashboard-nav {
+  background: var(--header-background);
+  border-bottom-color: var(--border-color);
+}
+
+.nav-tab {
+  color: var(--nav-tab-color);
+  border-bottom-color: transparent;
+}
+
+.nav-tab:hover {
+  color: var(--text-color-primary);
+  background: var(--nav-tab-hover-bg);
+}
+
+.nav-tab.active {
+  color: var(--nav-tab-active-color);
+  border-bottom-color: var(--nav-tab-active-border);
+  background: var(--nav-tab-active-bg);
+}
+
+/* Formulario de hábitos */
+.habit-form {
+  background-color: var(--card-background);
+}
+
+.habit-form input,
+.habit-form textarea,
+.habit-form select {
+  background-color: var(--input-background);
+  color: var(--text-color-primary);
+  border-color: var(--input-border);
+}
+
+.habit-form button {
+  background-color: var(--button-primary-bg);
+  color: white;
+}
+
+.habit-form button:hover:not(:disabled) {
+  background-color: var(--button-primary-hover-bg);
+}
+
+.habit-form button:disabled {
+  background-color: var(--button-secondary-bg); /* Use a neutral disabled color */
+}
+
+/* Lista de hábitos */
+.habit-item {
+  background-color: var(--card-background);
+  color: var(--text-color-primary);
+  border: 1px solid var(--border-color);
+}
+
+.habit-item h3 {
+  color: var(--text-color-primary);
+}
+
+.habit-item p {
+  color: var(--text-color-secondary);
+}
+
+.frequency,
+.created-date,
+.streak-current,
+.streak-best,
+.last-checkin {
+  color: white; /* Keep text white on colored badges */
+}
+
+.delete-btn {
+  background-color: var(--button-danger-bg);
+}
+
+.delete-btn:hover {
+  background-color: var(--button-danger-hover-bg);
+}
+
+.no-habits {
+  background-color: var(--card-background);
+  color: var(--text-color-secondary);
+}
+
+.loading,
+.error {
+  background-color: var(--card-background);
+  color: var(--text-color-primary);
+}
+
+.loading {
+  color: var(--nav-tab-active-color); /* Use a consistent loading color */
+}
+
+.error {
+  color: var(--error-text);
+  background-color: var(--error-bg);
+}
+
+.refresh-btn {
+  background: var(--button-primary-bg);
+  color: white;
+}
+
+.refresh-btn:hover {
+  background: var(--button-primary-hover-bg);
+}
+
+/* Estilos para la edición de hábitos */
+.edit-btn {
+  background-color: var(--button-secondary-bg);
+}
+
+.edit-btn:hover:not(:disabled) {
+  background-color: var(--button-secondary-hover-bg);
+}
+
+.edit-input,
+.edit-textarea,
+.edit-select {
+  background-color: var(--input-background);
+  color: var(--text-color-primary);
+  border-color: var(--nav-tab-active-border); /* Use active color for edit border */
+}
+
+.save-btn {
+  background-color: var(--button-primary-bg);
+}
+
+.save-btn:hover:not(:disabled) {
+  background-color: var(--button-primary-hover-bg);
+}
+
+.cancel-btn {
+  background-color: var(--button-secondary-bg); /* Use a neutral cancel color */
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background-color: var(--button-secondary-hover-bg);
+}
+
+/* Estilos para el botón de check-in */
+.checkin-btn {
+  background-color: var(--button-primary-bg);
+}
+
+.checkin-btn:hover:not(:disabled) {
+  background-color: var(--button-primary-hover-bg);
+}
+
+.checkin-btn.checkin-completed {
+  background-color: var(--button-secondary-bg); /* Use a neutral completed color */
+}
+
+/* Auth Styles */
+.auth-container {
+  background: var(--background-color); /* Use theme variable for auth background */
+}
+
+.auth-card {
+  background: var(--card-background);
+  box-shadow: 0 10px 25px var(--shadow-color);
+}
+
+.auth-card h2 {
+  color: var(--text-color-primary);
+}
+
+.auth-description {
+  color: var(--text-color-secondary);
+}
+
+.form-group label {
+  color: var(--text-color-primary);
+}
+
+.form-group input {
+  background-color: var(--input-background);
+  color: var(--text-color-primary);
+  border-color: var(--border-color);
+}
+
+.form-group input:focus {
+  border-color: var(--nav-tab-active-color);
+  box-shadow: 0 0 0 3px var(--nav-tab-active-color); /* Adjust shadow for focus */
+}
+
+.auth-button.primary {
+  background: linear-gradient(135deg, var(--nav-tab-active-color) 0%, var(--button-secondary-hover-bg) 100%); /* Use theme colors */
+  color: white;
+}
+
+.auth-button.primary:hover:not(:disabled) {
+  box-shadow: 0 5px 15px var(--shadow-color);
+}
+
+.auth-divider::before {
+  background: var(--border-color);
+}
+
+.auth-divider span {
+  background: var(--card-background);
+  color: var(--text-color-secondary);
+}
+
+.auth-button.google {
+  background: var(--card-background);
+  color: var(--text-color-primary);
+  border-color: var(--border-color);
+}
+
+.auth-button.google:hover:not(:disabled) {
+  border-color: var(--nav-tab-active-color);
+  box-shadow: 0 2px 10px var(--shadow-color);
+}
+
+.auth-button.facebook {
+  background: #1877f2; /* Keep Facebook color consistent */
+  color: white;
+}
+
+.auth-links a {
+  color: var(--nav-tab-active-color);
+}
+
+.auth-links a:hover {
+  color: var(--button-secondary-hover-bg);
+}
+
+.error-message {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border-color: var(--error-text);
+}
+
+.success-message {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-color: var(--success-text);
+}
+
+/* Dashboard Styles */
+.dashboard-container {
+  background: var(--background-color);
+}
+
+.dashboard-header {
+  background: var(--header-background);
+  box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.user-details h3 {
+  color: var(--text-color-primary);
+}
+
+.user-details p {
+  color: var(--text-color-secondary);
+}
+
+.logout-btn {
+  background: var(--button-danger-bg);
+}
+
+.logout-btn:hover {
+  background: var(--button-danger-hover-bg);
+}
+
+.loading-container {
+  background: var(--background-color);
+}
+
+/* Progress Dashboard Styles */
+.dashboard-header-section h2 {
+  color: var(--text-color-primary);
+}
+
+.dashboard-subtitle {
+  color: var(--text-color-secondary);
+}
+
+.kpi-card {
+  background: var(--card-background);
+  box-shadow: 0 4px 6px -1px var(--shadow-color);
+}
+
+.kpi-value {
+  color: var(--kpi-value-color);
+}
+
+.kpi-description {
+  color: var(--kpi-description-color);
+}
+
+.chart-section {
+  background: var(--card-background);
+  box-shadow: 0 4px 6px -1px var(--shadow-color);
+}
+
+.additional-stats {
+  background: var(--card-background);
+  box-shadow: 0 4px 6px -1px var(--shadow-color);
+}
+
+.stat-item {
+  background: var(--stat-item-bg);
+  border-color: var(--stat-item-border);
+}
+
+.stat-label {
+  color: var(--stat-label-color);
+}
+
+.stat-value {
+  color: var(--stat-value-color);
+}
+
+.refresh-btn {
+  background: linear-gradient(135deg, var(--nav-tab-active-color) 0%, var(--button-secondary-hover-bg) 100%);
+}
+
+.refresh-btn:hover {
+  box-shadow: 0 8px 15px var(--shadow-color);
+}
+
+.no-data {
+  background: var(--no-data-bg);
+  color: var(--no-data-color);
+}
+
+/* Habits Search Styles */
+.habits-search {
+  background: var(--search-bg);
+  box-shadow: 0 2px 4px var(--shadow-color);
+  border-color: var(--search-border);
+}
+
+.search-header h3 {
+  color: var(--text-color-primary);
+}
+
+.results-count {
+  color: var(--text-color-secondary);
+}
+
+.search-icon {
+  color: var(--search-icon-color);
+}
+
+.search-input {
+  background-color: var(--input-background);
+  color: var(--text-color-primary);
+  border-color: var(--search-border);
+}
+
+.search-input:focus {
+  border-color: var(--nav-tab-active-color);
+  box-shadow: 0 0 0 3px var(--nav-tab-active-color);
+}
+
+.clear-search-btn {
+  color: var(--search-clear-btn-color);
+}
+
+.clear-search-btn:hover {
+  color: var(--text-color-secondary);
+  background-color: var(--search-clear-btn-hover-bg);
+}
+
+.filter-group label {
+  color: var(--filter-label-color);
+}
+
+.filter-select {
+  background: var(--input-background);
+  color: var(--text-color-primary);
+  border-color: var(--search-border);
+}
+
+.filter-select:focus {
+  border-color: var(--nav-tab-active-color);
+  box-shadow: 0 0 0 3px var(--nav-tab-active-color);
+}
+
+.clear-filters-btn {
+  background: var(--button-danger-bg);
+}
+
+.clear-filters-btn:hover {
+  background: var(--button-danger-hover-bg);
+}
+
+.active-filters {
+  border-top-color: var(--border-color);
+}
+
+.filters-label {
+  color: var(--filter-label-color);
+}
+
+.filter-pill {
+  background: var(--filter-pill-bg);
+  border-color: var(--filter-pill-border);
+}
+
+.pill-label {
+  color: var(--filter-pill-label-color);
+}
+
+.pill-value {
+  color: var(--filter-pill-value-color);
+}
+
+.pill-remove {
+  color: var(--filter-pill-remove-color);
+}
+
+.pill-remove:hover {
+  background: var(--filter-pill-remove-hover-bg);
+  color: var(--filter-pill-label-color);
+}
+
+.no-results {
+  background: var(--no-results-bg);
+  border-color: var(--no-results-border);
+  color: var(--no-results-text);
 }

@@ -8,6 +8,7 @@ const GoogleAuthButton = () => {
   const { currentUser } = useAuth()
   const [isConnected, setIsConnected] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const checkConnectionStatus = async () => {
@@ -18,9 +19,11 @@ const GoogleAuthButton = () => {
       try {
         const response = await axiosInstance.get("/integrations/google/status")
         setIsConnected(response.data.isConnected)
+        setError(null)
       } catch (err) {
         console.error("Error checking Google connection status:", err)
         setIsConnected(false)
+        setError("Error al verificar conexión con Google Calendar.")
       } finally {
         setLoading(false)
       }
@@ -41,6 +44,7 @@ const GoogleAuthButton = () => {
         `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`,
       )
     } else if (params.get("googleAuthError")) {
+      setError(`Error al conectar con Google Calendar: ${params.get("googleAuthError")}`)
       alert(`Error al conectar con Google Calendar: ${params.get("googleAuthError")}`)
       // Clean up URL
       params.delete("googleAuthError")
@@ -65,7 +69,7 @@ const GoogleAuthButton = () => {
       }
     } catch (err) {
       console.error("Error initiating Google OAuth:", err)
-      alert("No se pudo iniciar la conexión con Google Calendar.")
+      setError("No se pudo iniciar la conexión con Google Calendar.")
       setLoading(false)
     }
   }

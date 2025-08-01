@@ -6,8 +6,7 @@ import connectDB from "./db/connect.js"
 import habitRoutes from "./routes/habitRoutes.js"
 import statsRoutes from "./routes/statsRoutes.js"
 import googleRoutes from "./routes/googleRoutes.js"
-import achievementRoutes from "./routes/achievementRoutes.js"
-import userRoutes from "./routes/userRoutes.js" // NEW: Import user routes
+import achievementRoutes from "./routes/achievementRoutes.js" // Import the new route
 
 // Configurar variables de entorno
 dotenv.config()
@@ -37,8 +36,7 @@ app.get("/", (req, res) => {
       habits: "/api/habits",
       stats: "/api/stats",
       google: "/api/integrations/google",
-      achievements: "/api/achievements",
-      users: "/api/users", // NEW: User preferences endpoint
+      achievements: "/api/achievements", // New endpoint
     },
   })
 })
@@ -56,8 +54,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/habits", habitRoutes)
 app.use("/api/stats", statsRoutes)
 app.use("/api/integrations/google", googleRoutes)
-app.use("/api/achievements", achievementRoutes)
-app.use("/api/users", userRoutes) // NEW: Use user routes
+app.use("/api/achievements", achievementRoutes) // New route
 
 // Middleware para rutas no encontradas
 app.use((req, res) => {
@@ -74,9 +71,7 @@ app.use((req, res) => {
       "GET /api/stats/habits/:id",
       "GET /api/integrations/google/auth",
       "GET /api/integrations/google/callback",
-      "GET /api/achievements",
-      "PUT /api/users/preferences", // NEW
-      "GET /api/users/preferences", // NEW
+      "GET /api/achievements", // New route
     ],
   })
 })
@@ -110,8 +105,7 @@ const startServer = async () => {
       console.log(`📈 API Stats: http://localhost:${PORT}/api/stats`)
       console.log(`🔗 MongoDB conectado correctamente`)
       console.log(`🔗 Google Calendar Integration: http://localhost:${PORT}/api/integrations/google/auth`)
-      console.log(`🏆 API Achievements: http://localhost:${PORT}/api/achievements`)
-      console.log(`👤 API User Preferences: http://localhost:${PORT}/api/users/preferences`) // NEW log
+      console.log(`🏆 API Achievements: http://localhost:${PORT}/api/achievements`) // New log
     })
   } catch (error) {
     console.error("❌ Error al iniciar el servidor:", error.message)

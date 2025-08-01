@@ -6,8 +6,7 @@ import { useNavigate } from "react-router-dom"
 import HabitsList from "./HabitsList"
 import ProgressDashboard from "./ProgressDashboard"
 import GoogleAuthButton from "./GoogleAuthButton"
-import AchievementsList from "./AchievementsList"
-import ThemeToggle from "./ThemeToggle" // NEW: Import ThemeToggle
+import AchievementsList from "./AchievementsList" // New import
 import "../ProgressDashboard.css"
 
 const Dashboard = () => {
@@ -43,8 +42,9 @@ const Dashboard = () => {
           </div>
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <ThemeToggle /> {/* NEW: Add ThemeToggle */}
-          <GoogleAuthButton />
+          {" "}
+          {/* New wrapper div */}
+          <GoogleAuthButton /> {/* New button */}
           <button onClick={handleLogout} className="logout-btn">
             Cerrar Sesión
           </button>
@@ -67,7 +67,7 @@ const Dashboard = () => {
             📊 Progreso
           </button>
           <button
-            className={`nav-tab ${activeTab === "achievements" ? "active" : ""}`}
+            className={`nav-tab ${activeTab === "achievements" ? "active" : ""}`} // New tab
             onClick={() => setActiveTab("achievements")}
           >
             🏆 Logros
@@ -78,7 +78,7 @@ const Dashboard = () => {
       <main className="dashboard-content">
         {activeTab === "habits" && <HabitsList />}
         {activeTab === "progress" && <ProgressDashboard />}
-        {activeTab === "achievements" && <AchievementsList />}
+        {activeTab === "achievements" && <AchievementsList />} {/* New content */}
       </main>
     </div>
   )

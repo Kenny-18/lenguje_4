@@ -190,29 +190,29 @@ const weighMood = async (userId, days = 7) => {
   }
 }
 
-export const getDailyAISuggestion = async (userId) => {
+export const getAISuggestion = async (req, res) => {
   const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
-  const cacheKey = `ai_suggestion:${userId}:${today}`
+  const cacheKey = `ai_suggestion:${req.user.uid}:${today}`
 
   try {
     // 1. Check Redis cache first (only if Redis is available)
     const cachedSuggestion = await getFromRedisCache(cacheKey)
     if (cachedSuggestion) {
-      console.log(`✅ AI Suggestion for ${userId} on ${today} found in cache.`)
-      return cachedSuggestion
+      console.log(`✅ AI Suggestion for ${req.user.uid} on ${today} found in cache.`)
+      return res.status(200).json(cachedSuggestion)
     }
 
     // 2. ✅ Verificar que tenemos Google Generative AI API key
     if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
       console.warn("⚠️ Google Generative AI API key not found, using fallback")
-      return { ...getRandomFallbackSuggestion(), moodConsidered: false } // Add moodConsidered flag
+      return res.status(200).json({ ...getRandomFallbackSuggestion(), moodConsidered: false }) // Add moodConsidered flag
     }
 
     // NEW: Get mood context
-    let { context: moodContext, moodFound } = await weighMood(userId, 7) // Consider last 7 days
+    let { context: moodContext, moodFound } = await weighMood(req.user.uid, 7) // Consider last 7 days
 
     // 3. If not in cache, call Google Gemini
-    console.log(`🔄 Generating new AI suggestion with Google Gemini for ${userId} on ${today}...`)
+    console.log(`🔄 Generating new AI suggestion with Google Gemini for ${req.user.uid} on ${today}...`)
 
     // Prompt optimizado para Gemini, ahora incluyendo mood context
     const prompt = `Genera una sugerencia de hábito saludable diario en español.
@@ -266,13 +266,13 @@ export const getDailyAISuggestion = async (userId) => {
     const finalSuggestion = { ...suggestion, moodConsidered: moodFound } // Add moodConsidered flag
     await setInRedisCache(cacheKey, finalSuggestion, CACHE_TTL_SECONDS)
 
-    return finalSuggestion
+    res.status(200).json(finalSuggestion)
   } catch (error) {
     console.error("❌ Error in getDailyAISuggestion:", error.message)
 
     // Return a random fallback suggestion in case of any error
     const fallbackSuggestion = getRandomFallbackSuggestion()
     console.log("🔄 Using fallback suggestion due to error:", fallbackSuggestion.title)
-    return { ...fallbackSuggestion, moodConsidered: false } // Add moodConsidered flag
+    res.status(500).json({ ...fallbackSuggestion, moodConsidered: false }) // Add moodConsidered flag
   }
 }

@@ -6,11 +6,12 @@ import connectDB from "./db/connect.js"
 import habitRoutes from "./routes/habitRoutes.js"
 import statsRoutes from "./routes/statsRoutes.js"
 import googleRoutes from "./routes/googleRoutes.js"
-import achievementRoutes from "./routes/achievementRoutes.js" // ✅ Cambiar achievementsRoutes por achievementRoutes
+import achievementRoutes from "./routes/achievementRoutes.js"
 import userRoutes from "./routes/userRoutes.js"
 import aiRoutes from "./routes/aiRoutes.js"
 import shareRoutes from "./routes/shareRoutes.js"
 import moodRoutes from "./routes/moodRoutes.js"
+import exportRoutes from "./routes/exportRoutes.js" // NEW: Import export routes
 import { loadSentimentModel } from "./controllers/moodController.js"
 
 // Configurar variables de entorno
@@ -50,6 +51,7 @@ app.get("/", (req, res) => {
       ai: "/api/ai",
       share: "/api/share",
       moods: "/api/moods",
+      export: "/api/export", // NEW: Add export endpoint
     },
   })
 })
@@ -67,12 +69,13 @@ app.get("/api/health", (req, res) => {
 app.use("/api/habits", habitRoutes)
 app.use("/api/stats", statsRoutes)
 app.use("/api/integrations/google", googleRoutes)
-app.use("/api/achievements", achievementRoutes) // ✅ Cambiar achievementsRoutes por achievementRoutes
+app.use("/api/achievements", achievementRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/ai", aiRoutes)
 app.use("/api/share", shareRoutes)
 app.use("/share", shareRoutes) // Ruta pública para compartir (sin /api)
 app.use("/api/moods", moodRoutes)
+app.use("/api/export", exportRoutes) // NEW: Use export routes
 
 // Middleware de manejo de errores global
 app.use((err, req, res, next) => {
@@ -97,6 +100,7 @@ app.use("*", (req, res) => {
       ai: "/api/ai",
       share: "/api/share",
       moods: "/api/moods",
+      export: "/api/export", // NEW: Include export in error message
     },
   })
 })
@@ -124,6 +128,7 @@ const startServer = async () => {
       console.log(`🧠 API AI Suggestions: http://localhost:${PORT}/api/ai/suggest`)
       console.log(`🔗 API Share: http://localhost:${PORT}/api/share`)
       console.log(`😊 API Moods: http://localhost:${PORT}/api/moods`)
+      console.log(`📦 API Export: http://localhost:${PORT}/api/export`) // NEW: Log export endpoint
     })
   } catch (error) {
     console.error("❌ Error al inicializar el servidor:", error)

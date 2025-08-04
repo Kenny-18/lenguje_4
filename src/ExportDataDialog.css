@@ -1,0 +1,144 @@
+.export-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.export-dialog-content {
+  background-color: var(--card-background);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  color: var(--text-color-primary);
+  border: 1px solid var(--border-color);
+}
+
+.export-dialog-content h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: var(--text-color-primary);
+}
+
+.export-dialog-content p {
+  font-size: 1rem;
+  color: var(--text-color-secondary);
+  margin-bottom: 25px;
+}
+
+.format-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.format-options label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-color-primary);
+  cursor: pointer;
+}
+
+.format-options input[type="radio"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  transition: all 0.2s ease;
+}
+
+.format-options input[type="radio"]::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: scale(0);
+  transition: transform 0.2s ease;
+  background-color: var(--nav-tab-active-color);
+}
+
+.format-options input[type="radio"]:checked {
+  border-color: var(--nav-tab-active-color);
+}
+
+.format-options input[type="radio"]:checked::before {
+  transform: scale(1);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.export-btn,
+.cancel-btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.export-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.export-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.cancel-btn {
+  background-color: var(--button-secondary-bg);
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: var(--button-secondary-hover-bg);
+}
+
+.export-note {
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+  margin-top: 25px;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .export-dialog-content {
+    padding: 20px;
+  }
+
+  .export-dialog-content h3 {
+    font-size: 1.5rem;
+  }
+
+  .dialog-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

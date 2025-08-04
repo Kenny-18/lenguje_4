@@ -15,8 +15,8 @@ import {
   PointElement,
 } from "chart.js"
 import { Bar } from "react-chartjs-2"
-import html2canvas from "html2canvas" // NEW: Import html2canvas
-// import { WhatsappShareButton, WhatsappIcon } from "react-share"; // Optional: for react-share components
+import html2canvas from "html2canvas"
+import ExportDataDialog from "./ExportDataDialog" // NEW: Import ExportDataDialog
 
 // Registrar componentes de Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend)
@@ -25,9 +25,10 @@ const ProgressDashboard = () => {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [shareLink, setShareLink] = useState(null) // NEW: State for the generated share link
-  const [sharing, setSharing] = useState(false) // NEW: State for sharing loading
-  const [shareError, setShareError] = useState(null) // NEW: State for sharing errors
+  const [shareLink, setShareLink] = useState(null)
+  const [sharing, setSharing] = useState(false)
+  const [shareError, setShareError] = useState(null)
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false) // NEW: State for export dialog
   const { currentUser } = useAuth()
 
   // Función para obtener estadísticas
@@ -53,7 +54,7 @@ const ProgressDashboard = () => {
     }
   }, [currentUser, fetchStats])
 
-  // NEW: Handle sharing progress
+  // Handle sharing progress
   const handleShareProgress = async () => {
     setSharing(true)
     setShareLink(null)
@@ -67,17 +68,16 @@ const ProgressDashboard = () => {
 
       // Capture the dashboard as an image
       const canvas = await html2canvas(dashboardElement, {
-        useCORS: true, // Important for images loaded from other origins
-        scale: 2, // Increase scale for better quality
-        logging: false, // Disable html2canvas logs
+        useCORS: true,
+        scale: 2,
+        logging: false,
       })
 
-      const imageData = canvas.toDataURL("image/png") // Get base64 image data
+      const imageData = canvas.toDataURL("image/png")
 
       // Send image data to backend to get a shareable link
       const response = await axiosInstance.post("/share", {
         imageUrl: imageData,
-        // You could add more context here, e.g., habitId if sharing a specific habit's stats
       })
 
       setShareLink(response.data.shareUrl)
@@ -87,6 +87,62 @@ const ProgressDashboard = () => {
       setShareError("Error al generar link para compartir: " + (err.response?.data?.message || err.message))
     } finally {
       setSharing(false)
+    }
+  }
+
+  // NEW: Handle export data
+  const handleExportData = async (format) => {
+    if (!currentUser) {
+      alert("Debes iniciar sesión para exportar tus datos.")
+      return
+    }
+
+    try {
+      setLoading(true) // Use loading state for export as well
+      const token = await currentUser.getIdToken() // Get the latest ID token
+
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:3000"
+      const exportUrl = `${backendUrl}/api/export?format=${format}`
+
+      const response = await fetch(exportUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // Or 'text/csv' depending on expected response
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Error al exportar datos.")
+      }
+
+      // Get filename from Content-Disposition header
+      const contentDisposition = response.headers.get("Content-Disposition")
+      let filename = `habit_tracker_export_${new Date().toISOString().slice(0, 10)}.zip`
+      if (contentDisposition && contentDisposition.indexOf("attachment") !== -1) {
+        const filenameMatch = contentDisposition.match(/filename="([^"]+)"/)
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1]
+        }
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url) // Clean up the object URL
+
+      alert("¡Datos exportados exitosamente!")
+    } catch (err) {
+      console.error("Error exporting data:", err)
+      alert(`Error al exportar datos: ${err.message}`)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -170,8 +226,6 @@ const ProgressDashboard = () => {
 
   return (
     <div className="progress-dashboard">
-      {" "}
-      {/* This is the element to be captured */}
       <div className="dashboard-header-section">
         <h2>Dashboard de Progreso</h2>
         <p className="dashboard-subtitle">Resumen de tu progreso en los últimos 30 días</p>
@@ -261,13 +315,6 @@ const ProgressDashboard = () => {
             >
               {shareLink}
             </a>
-            {/* Optional: You can integrate react-share components here for direct sharing to social media */}
-            {/* For example, for WhatsApp: */}
-            {/* <div style={{ marginTop: "10px", display: "flex", gap: "10px", justifyContent: "center" }}>
-              <WhatsappShareButton url={shareLink} title="¡Mira mi progreso de hábitos!">
-                <WhatsappIcon size={32} round />
-              </WhatsappShareButton>
-            </div> */}
           </div>
         )}
         {shareError && (
@@ -276,12 +323,25 @@ const ProgressDashboard = () => {
           </div>
         )}
       </div>
+      {/* NEW: Export Data Button */}
+      <div className="dashboard-actions" style={{ marginTop: "20px" }}>
+        <button onClick={() => setIsExportDialogOpen(true)} className="refresh-btn">
+          ⬇️ Exportar Datos
+        </button>
+      </div>
       {/* Refresh Button */}
       <div className="dashboard-actions" style={{ marginTop: "20px" }}>
         <button onClick={fetchStats} className="refresh-btn">
           Actualizar Estadísticas
         </button>
       </div>
+
+      {/* NEW: Export Data Dialog */}
+      <ExportDataDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        onExport={handleExportData}
+      />
     </div>
   )
 }

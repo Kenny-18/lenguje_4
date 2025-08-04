@@ -388,6 +388,10 @@
     font-size: 2rem;
   }
 
+  .mood-subtitle {
+    font-size: 1rem;
+  }
+
   .mood-input-section,
   .mood-history-section {
     padding: 20px;

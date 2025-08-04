@@ -17,7 +17,7 @@ const SyncHabitToCalendarButton = ({ habitId, habitTitle }) => {
   useEffect(() => {
     const checkGoogleConnection = async () => {
       if (!currentUser) return
-      
+
       try {
         const response = await axiosInstance.get("/integrations/google/status")
         setIsConnected(response.data.isConnected)
@@ -49,7 +49,7 @@ const SyncHabitToCalendarButton = ({ habitId, habitTitle }) => {
     setSyncing(true)
     setMessage(null)
     setIsError(false)
-    
+
     // Limpiar timeout anterior si existe
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
@@ -92,11 +92,7 @@ const SyncHabitToCalendarButton = ({ habitId, habitTitle }) => {
       >
         {syncing ? "🔄 Sincronizando..." : isConnected ? "📅 Sincronizar GCal" : "🔗 Conectar GCal"}
       </button>
-      {message && (
-        <span className={`sync-message ${isError ? 'error' : 'success'}`}>
-          {message}
-        </span>
-      )}
+      {message && <span className={`sync-message ${isError ? "error" : "success"}`}>{message}</span>}
     </div>
   )
 }

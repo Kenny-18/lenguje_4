@@ -92,6 +92,23 @@ html.dark .suggestion-reason {
   color: #b2ebf2; /* Lighter blue for dark theme */
 }
 
+.mood-badge {
+  display: inline-block;
+  background-color: #a78bfa; /* A nice purple */
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+html.dark .mood-badge {
+  background-color: #c4b5fd; /* Lighter purple for dark theme */
+  color: #312e81; /* Darker text for contrast */
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .daily-suggestion-card {

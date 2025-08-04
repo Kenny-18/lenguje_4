@@ -386,7 +386,7 @@ code {
 .success-message {
   background: var(--success-bg);
   color: var(--success-text);
-  border-color: var(--success-text);
+  border: 1px solid var(--success-text);
 }
 
 /* Dashboard Styles */

@@ -6,12 +6,12 @@ import connectDB from "./db/connect.js"
 import habitRoutes from "./routes/habitRoutes.js"
 import statsRoutes from "./routes/statsRoutes.js"
 import googleRoutes from "./routes/googleRoutes.js"
-import achievementRoutes from "./routes/achievementRoutes.js"
+import achievementRoutes from "./routes/achievementRoutes.js" // ✅ Cambiar achievementsRoutes por achievementRoutes
 import userRoutes from "./routes/userRoutes.js"
 import aiRoutes from "./routes/aiRoutes.js"
 import shareRoutes from "./routes/shareRoutes.js"
 import moodRoutes from "./routes/moodRoutes.js"
-import { loadSentimentModel } from "./controllers/moodController.js" // NEW: Import loadSentimentModel
+import { loadSentimentModel } from "./controllers/moodController.js"
 
 // Configurar variables de entorno
 dotenv.config()
@@ -22,7 +22,11 @@ const PORT = process.env.PORT || 3000
 // Middlewares
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL || "http://localhost:3000", "http://localhost:5173", "http://localhost:3001"],
+    origin: [
+      process.env.FRONTEND_URL || "http://localhost:3000", 
+      "http://localhost:5173", 
+      "http://localhost:3001"
+    ],
     credentials: true,
   }),
 )
@@ -63,70 +67,57 @@ app.get("/api/health", (req, res) => {
 app.use("/api/habits", habitRoutes)
 app.use("/api/stats", statsRoutes)
 app.use("/api/integrations/google", googleRoutes)
-app.use("/api/achievements", achievementRoutes)
+app.use("/api/achievements", achievementRoutes) // ✅ Cambiar achievementsRoutes por achievementRoutes
 app.use("/api/users", userRoutes)
 app.use("/api/ai", aiRoutes)
 app.use("/api/share", shareRoutes)
+app.use("/share", shareRoutes) // Ruta pública para compartir (sin /api)
 app.use("/api/moods", moodRoutes)
 
-// Middleware para rutas no encontradas
-app.use((req, res) => {
-  res.status(404).json({
-    message: `Ruta ${req.originalUrl} no encontrada`,
-    availableRoutes: [
-      "GET /",
-      "GET /api/health",
-      "GET /api/habits",
-      "POST /api/habits",
-      "PUT /api/habits/:id",
-      "DELETE /api/habits/:id",
-      "GET /api/stats/overview",
-      "GET /api/stats/habits/:id",
-      "GET /api/integrations/google/auth",
-      "GET /api/integrations/google/callback",
-      "GET /api/achievements",
-      "PUT /api/users/preferences",
-      "GET /api/users/preferences",
-      "GET /api/ai/suggest",
-      "POST /api/share",
-      "GET /share/:token",
-      "POST /api/moods",
-      "GET /api/moods",
-    ],
-  })
-})
-
-// Middleware global de manejo de errores
+// Middleware de manejo de errores global
 app.use((err, req, res, next) => {
-  console.error("Error stack:", err.stack)
-
-  res.status(err.status || 500).json({
-    message: err.message || "Error interno del servidor",
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+  console.error("Error no manejado:", err.stack)
+  res.status(500).json({
+    message: "Error interno del servidor",
+    error: process.env.NODE_ENV === "production" ? {} : err.message,
   })
 })
 
-// Función para iniciar el servidor
+// Middleware para rutas no encontradas
+app.use("*", (req, res) => {
+  res.status(404).json({
+    message: "Ruta no encontrada",
+    availableEndpoints: {
+      health: "/api/health",
+      habits: "/api/habits",
+      stats: "/api/stats",
+      google: "/api/integrations/google",
+      achievements: "/api/achievements",
+      users: "/api/users",
+      ai: "/api/ai",
+      share: "/api/share",
+      moods: "/api/moods",
+    },
+  })
+})
+
+// Función para inicializar el servidor
 const startServer = async () => {
   try {
-    // Verificar que existe la URI de MongoDB
-    if (!process.env.MONGODB_URI) {
-      throw new Error("MONGODB_URI no está definida en las variables de entorno")
-    }
-
-    // Conectar a MongoDB antes de iniciar el servidor
+    // Conectar a MongoDB
     await connectDB()
+    console.log("🔗 MongoDB conectado correctamente")
 
-    // NEW: Load sentiment model after DB connection
+    // Inicializar modelo de sentimientos
     await loadSentimentModel()
 
+    // Iniciar servidor
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en puerto ${PORT}`)
       console.log(`🌐 URL base: http://localhost:${PORT}`)
       console.log(`📊 Health check: http://localhost:${PORT}/api/health`)
       console.log(`📝 API Habits: http://localhost:${PORT}/api/habits`)
       console.log(`📈 API Stats: http://localhost:${PORT}/api/stats`)
-      console.log(`🔗 MongoDB conectado correctamente`)
       console.log(`🔗 Google Calendar Integration: http://localhost:${PORT}/api/integrations/google/auth`)
       console.log(`🏆 API Achievements: http://localhost:${PORT}/api/achievements`)
       console.log(`👤 API User Preferences: http://localhost:${PORT}/api/users/preferences`)
@@ -135,21 +126,10 @@ const startServer = async () => {
       console.log(`😊 API Moods: http://localhost:${PORT}/api/moods`)
     })
   } catch (error) {
-    console.error("❌ Error al iniciar el servidor:", error.message)
+    console.error("❌ Error al inicializar el servidor:", error)
     process.exit(1)
   }
 }
 
-// Manejo de señales para cerrar gracefully
-process.on("SIGTERM", () => {
-  console.log("SIGTERM recibido, cerrando servidor...")
-  process.exit(0)
-})
-
-process.on("SIGINT", () => {
-  console.log("SIGINT recibido, cerrando servidor...")
-  process.exit(0)
-})
-
-// Iniciar servidor
+// Inicializar servidor
 startServer()

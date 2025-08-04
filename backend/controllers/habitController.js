@@ -1,7 +1,7 @@
 import Habit from "../models/Habit.js"
 import UserIntegration from "../models/UserIntegration.js"
 import { google } from "googleapis"
-import { startOfDay, addDays, formatISO } from "date-fns"
+import { startOfDay, addDays } from "date-fns"
 
 // Usar las MISMAS credenciales hardcodeadas que en googleController.js
 const GOOGLE_CLIENT_ID = "565430349554-9g8iv5nhtaohdqu3a22o3aj2rqe6mki1.apps.googleusercontent.com"
@@ -11,29 +11,25 @@ const GOOGLE_REDIRECT_URI = "http://localhost:3000/api/integrations/google/callb
 // Helper para obtener el cliente OAuth2
 const getOAuth2Client = async (userId) => {
   console.log("🔍 Buscando integración para usuario:", userId)
-  
+
   const userIntegration = await UserIntegration.findOne({ userId })
   console.log("📋 Integración encontrada:", {
     exists: !!userIntegration,
-    hasRefreshToken: !!userIntegration?.google?.refreshToken
+    hasRefreshToken: !!userIntegration?.google?.refreshToken,
   })
-  
+
   if (!userIntegration || !userIntegration.google?.refreshToken) {
     throw new Error("No se encontró la integración de Google Calendar para este usuario.")
   }
 
-  const oAuth2Client = new google.auth.OAuth2(
-    GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET,
-    GOOGLE_REDIRECT_URI,
-  )
-  
+  const oAuth2Client = new google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI)
+
   oAuth2Client.setCredentials({
     refresh_token: userIntegration.google.refreshToken,
   })
 
   console.log("🔐 OAuth2Client configurado correctamente")
-  
+
   try {
     // Obtener access token (esto también refresca si es necesario)
     const { credentials } = await oAuth2Client.refreshAccessToken()
@@ -52,7 +48,7 @@ export const syncHabitToGoogleCalendar = async (req, res) => {
     habitId: req.params.id,
     userId: req.user.uid,
   })
-  
+
   try {
     const { id: habitId } = req.params
     const userId = req.user.uid
@@ -111,7 +107,7 @@ export const syncHabitToGoogleCalendar = async (req, res) => {
     console.log("📋 Evento a crear:", {
       summary: event.summary,
       start: event.start.dateTime,
-      recurrence: event.recurrence
+      recurrence: event.recurrence,
     })
 
     const response = await calendar.events.insert({

@@ -9,8 +9,9 @@ import googleRoutes from "./routes/googleRoutes.js"
 import achievementRoutes from "./routes/achievementRoutes.js"
 import userRoutes from "./routes/userRoutes.js"
 import aiRoutes from "./routes/aiRoutes.js"
-import shareRoutes from "./routes/shareRoutes.js" // NEW: Import share routes
-import moodRoutes from "./routes/moodRoutes.js" // NEW: Import mood routes
+import shareRoutes from "./routes/shareRoutes.js"
+import moodRoutes from "./routes/moodRoutes.js"
+import { loadSentimentModel } from "./controllers/moodController.js" // NEW: Import loadSentimentModel
 
 // Configurar variables de entorno
 dotenv.config()
@@ -43,8 +44,8 @@ app.get("/", (req, res) => {
       achievements: "/api/achievements",
       users: "/api/users",
       ai: "/api/ai",
-      share: "/api/share", // NEW
-      moods: "/api/moods", // NEW
+      share: "/api/share",
+      moods: "/api/moods",
     },
   })
 })
@@ -65,8 +66,8 @@ app.use("/api/integrations/google", googleRoutes)
 app.use("/api/achievements", achievementRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/ai", aiRoutes)
-app.use("/api/share", shareRoutes) // NEW: Use share routes
-app.use("/api/moods", moodRoutes) // NEW: Use mood routes
+app.use("/api/share", shareRoutes)
+app.use("/api/moods", moodRoutes)
 
 // Middleware para rutas no encontradas
 app.use((req, res) => {
@@ -87,10 +88,10 @@ app.use((req, res) => {
       "PUT /api/users/preferences",
       "GET /api/users/preferences",
       "GET /api/ai/suggest",
-      "POST /api/share", // NEW
-      "GET /share/:token", // NEW
-      "POST /api/moods", // NEW
-      "GET /api/moods", // NEW
+      "POST /api/share",
+      "GET /share/:token",
+      "POST /api/moods",
+      "GET /api/moods",
     ],
   })
 })
@@ -116,6 +117,9 @@ const startServer = async () => {
     // Conectar a MongoDB antes de iniciar el servidor
     await connectDB()
 
+    // NEW: Load sentiment model after DB connection
+    await loadSentimentModel()
+
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en puerto ${PORT}`)
       console.log(`🌐 URL base: http://localhost:${PORT}`)
@@ -127,8 +131,8 @@ const startServer = async () => {
       console.log(`🏆 API Achievements: http://localhost:${PORT}/api/achievements`)
       console.log(`👤 API User Preferences: http://localhost:${PORT}/api/users/preferences`)
       console.log(`🧠 API AI Suggestions: http://localhost:${PORT}/api/ai/suggest`)
-      console.log(`🔗 API Share: http://localhost:${PORT}/api/share`) // NEW log
-      console.log(`😊 API Moods: http://localhost:${PORT}/api/moods`) // NEW log
+      console.log(`🔗 API Share: http://localhost:${PORT}/api/share`)
+      console.log(`😊 API Moods: http://localhost:${PORT}/api/moods`)
     })
   } catch (error) {
     console.error("❌ Error al iniciar el servidor:", error.message)

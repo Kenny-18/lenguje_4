@@ -1,6 +1,46 @@
 import { startOfDay, endOfDay, subDays } from "date-fns"
 import MoodNote from "../models/MoodNote.js"
 import { createMoodNoteSchema, getMoodNotesSchema } from "../validation/moodNoteValidation.js"
+import Sentiment from "sentiment" // ✅ Cambiar a 'sentiment'
+
+let sentimentAnalyzer
+
+// Function to load the sentiment analyzer once
+export async function loadSentimentModel() {
+  try {
+    console.log("Initializing sentiment analyzer...")
+    sentimentAnalyzer = new Sentiment()
+    console.log("✅ Sentiment analyzer initialized successfully.")
+  } catch (error) {
+    console.error("❌ Failed to initialize sentiment analyzer:", error)
+    sentimentAnalyzer = null
+  }
+}
+
+// Function to classify sentiment
+const classifySentiment = async (text) => {
+  if (!sentimentAnalyzer || !text || text.trim() === "") {
+    return "neutral" // Default to neutral if analyzer not loaded or no text
+  }
+
+  try {
+    // The sentiment library returns a score and comparative
+    const result = sentimentAnalyzer.analyze(text)
+    const score = result.score
+
+    // Define thresholds for classification based on score
+    if (score > 1) {
+      return "positive"
+    } else if (score < -1) {
+      return "negative"
+    } else {
+      return "neutral"
+    }
+  } catch (error) {
+    console.error("Error classifying sentiment:", error)
+    return "neutral" // Fallback to neutral on error
+  }
+}
 
 // POST /api/moods - Create a new mood note
 export const createMoodNote = async (req, res) => {
@@ -32,11 +72,15 @@ export const createMoodNote = async (req, res) => {
       })
     }
 
+    // Perform sentiment analysis on the note
+    const sentimentResult = await classifySentiment(note)
+
     const newMoodNote = new MoodNote({
       userId,
       date: today,
       emoji,
       note,
+      sentiment: sentimentResult,
     })
 
     const savedMoodNote = await newMoodNote.save()

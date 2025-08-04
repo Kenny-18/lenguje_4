@@ -23,6 +23,12 @@ const moodNoteSchema = new mongoose.Schema(
       maxlength: [200, "La nota no puede exceder 200 caracteres"],
       default: "",
     },
+    sentiment: {
+      // NEW FIELD
+      type: String,
+      enum: ["positive", "neutral", "negative"],
+      required: false, // Not required if note is empty
+    },
   },
   {
     timestamps: true,

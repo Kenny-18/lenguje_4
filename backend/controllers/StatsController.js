@@ -1,5 +1,6 @@
 import { startOfDay, subDays, format, eachDayOfInterval } from "date-fns"
-import { es } from "date-fns/locale"
+// ✅ Alternativa: importar como módulo completo
+import esLocale from "date-fns/locale/es/index.js"
 import Habit from "../models/Habit.js"
 import Checkin from "../models/Checkin.js"
 
@@ -93,7 +94,7 @@ export const getOverview = async (req, res) => {
 
       return {
         date: dateStr,
-        dateFormatted: format(date, "dd/MM", { locale: es }),
+        dateFormatted: format(date, "dd/MM", { locale: esLocale }), // ✅ Usar esLocale
         checkins: dayData ? dayData.count : 0,
         uniqueHabits: dayData ? dayData.habits.length : 0,
       }
@@ -187,7 +188,7 @@ export const getHabitStats = async (req, res) => {
 
       return {
         date: dateStr,
-        dateFormatted: format(date, "dd/MM", { locale: es }),
+        dateFormatted: format(date, "dd/MM", { locale: esLocale }), // ✅ Usar esLocale
         completed: hasCheckin ? 1 : 0,
       }
     })

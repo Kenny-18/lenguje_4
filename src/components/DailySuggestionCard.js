@@ -62,7 +62,7 @@ const DailySuggestionCard = () => {
     if (currentUser) {
       fetchSuggestion()
     }
-  }, [currentUser]) // ✅ Removido retryCount de las dependencias para evitar bucle infinito
+  }, [currentUser, fetchSuggestion]) // ✅ Agregar fetchSuggestion
 
   const handleManualRetry = () => {
     setRetryCount(0)

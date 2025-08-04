@@ -17,9 +17,37 @@ const MoodTracker = () => {
   const [todayMoodNote, setTodayMoodNote] = useState(null)
   const [moodNotes, setMoodNotes] = useState([])
   const [dateRange, setDateRange] = useState("last30days") // Default range
+  const [sentimentCounts, setSentimentCounts] = useState({ positive: 0, neutral: 0, negative: 0 }) // NEW
 
   const { currentUser } = useAuth()
   const MAX_NOTE_CHARS = 200
+
+  // Helper para obtener el ícono de sentimiento
+  const getSentimentIcon = (sentiment) => {
+    switch (sentiment) {
+      case "positive":
+        return "😊"
+      case "neutral":
+        return "😐"
+      case "negative":
+        return "😞"
+      default:
+        return ""
+    }
+  }
+
+  // NEW: Calculate sentiment counts
+  const calculateSentimentCounts = useCallback((notes) => {
+    let positive = 0
+    let neutral = 0
+    let negative = 0
+    notes.forEach((note) => {
+      if (note.sentiment === "positive") positive++
+      else if (note.sentiment === "neutral") neutral++
+      else if (note.sentiment === "negative") negative++
+    })
+    setSentimentCounts({ positive, neutral, negative })
+  }, [])
 
   const fetchTodayMoodNote = useCallback(async () => {
     if (!currentUser) return
@@ -49,6 +77,7 @@ const MoodTracker = () => {
       try {
         const response = await axiosInstance.get(`/moods?range=${range}`)
         setMoodNotes(response.data.moodNotes)
+        calculateSentimentCounts(response.data.moodNotes) // NEW: Calculate counts
       } catch (err) {
         setError("Error al cargar el historial de estados de ánimo: " + (err.response?.data?.message || err.message))
         console.error("Error fetching mood notes:", err)
@@ -56,7 +85,7 @@ const MoodTracker = () => {
         setIsLoading(false)
       }
     },
-    [currentUser],
+    [currentUser, calculateSentimentCounts],
   )
 
   useEffect(() => {
@@ -135,6 +164,11 @@ const MoodTracker = () => {
             <div className="recorded-mood-display">
               <span className="recorded-emoji">{todayMoodNote.emoji}</span>
               <p className="recorded-note">{todayMoodNote.note || "Sin nota."}</p>
+              {todayMoodNote.sentiment && ( // NEW: Display sentiment for today's note
+                <span className={`recorded-sentiment sentiment-${todayMoodNote.sentiment}`}>
+                  Sentimiento: {getSentimentIcon(todayMoodNote.sentiment)} {todayMoodNote.sentiment}
+                </span>
+              )}
             </div>
             <p className="recorded-message">Puedes ver tu historial abajo.</p>
           </div>
@@ -195,6 +229,26 @@ const MoodTracker = () => {
           </select>
         </div>
 
+        {/* NEW: General Sentiment Status */}
+        {moodNotes.length > 0 && (
+          <div className="general-sentiment-summary">
+            <h4>
+              Sentimiento General (
+              {dateRange === "all"
+                ? "Todo el historial"
+                : dateRange === "last7days"
+                  ? "Últimos 7 días"
+                  : "Últimos 30 días"}
+              ):
+            </h4>
+            <div className="sentiment-stats">
+              <span className="sentiment-stat positive">😊 Positivo: {sentimentCounts.positive}</span>
+              <span className="sentiment-stat neutral">😐 Neutral: {sentimentCounts.neutral}</span>
+              <span className="sentiment-stat negative">😞 Negativo: {sentimentCounts.negative}</span>
+            </div>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="loading">Cargando historial...</div>
         ) : moodNotes.length === 0 ? (
@@ -213,6 +267,11 @@ const MoodTracker = () => {
                 <div className="mood-item-content">
                   <span className="mood-item-emoji">{mood.emoji}</span>
                   <p className="mood-item-note">{mood.note || "Sin nota."}</p>
+                  {mood.sentiment && ( // NEW: Display sentiment for each note
+                    <span className={`mood-item-sentiment sentiment-${mood.sentiment}`}>
+                      {getSentimentIcon(mood.sentiment)}
+                    </span>
+                  )}
                 </div>
               </li>
             ))}

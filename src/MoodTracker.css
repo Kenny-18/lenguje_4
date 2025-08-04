@@ -161,6 +161,33 @@
   opacity: 0.8;
 }
 
+/* NEW: Sentiment display for today's note */
+.recorded-sentiment {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.recorded-sentiment.sentiment-positive {
+  background-color: #d4edda; /* Light green */
+  color: #155724; /* Dark green */
+}
+
+.recorded-sentiment.sentiment-neutral {
+  background-color: #ffeeba; /* Light yellow */
+  color: #856404; /* Dark yellow */
+}
+
+.recorded-sentiment.sentiment-negative {
+  background-color: #f8d7da; /* Light red */
+  color: #721c24; /* Dark red */
+}
+
 /* Mood History Section */
 .mood-history-section {
   background: var(--card-background);
@@ -199,6 +226,55 @@
   color: var(--text-color-primary);
   font-size: 1rem;
   cursor: pointer;
+}
+
+/* NEW: General Sentiment Summary */
+.general-sentiment-summary {
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.general-sentiment-summary h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: var(--text-color-primary);
+}
+
+.sentiment-stats {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sentiment-stat {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sentiment-stat.positive {
+  background-color: #e6ffed; /* Very light green */
+  color: #28a745; /* Green */
+}
+
+.sentiment-stat.neutral {
+  background-color: #fff3cd; /* Very light yellow */
+  color: #ffc107; /* Yellow */
+}
+
+.sentiment-stat.negative {
+  background-color: #fdeded; /* Very light red */
+  color: #dc3545; /* Red */
 }
 
 .mood-notes-list {
@@ -264,6 +340,13 @@
   font-size: 1rem;
   color: var(--text-color-primary);
   flex-grow: 1;
+}
+
+/* NEW: Sentiment icon for each mood note item */
+.mood-item-sentiment {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-left: auto; /* Push to the right */
 }
 
 .no-mood-notes {
@@ -335,6 +418,11 @@
     position: static;
     margin-left: 10px;
   }
+
+  .sentiment-stats {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 @media (max-width: 480px) {
@@ -362,5 +450,9 @@
 
   .mood-item-note {
     font-size: 0.9rem;
+  }
+
+  .mood-item-sentiment {
+    font-size: 1.2rem;
   }
 }

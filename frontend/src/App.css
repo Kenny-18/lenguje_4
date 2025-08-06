@@ -248,6 +248,7 @@
   flex-direction: column;
   gap: 8px;
   margin-left: 15px;
+  min-width: 200px; /* Asegurar un ancho mínimo */
 }
 
 .edit-btn {
@@ -343,6 +344,7 @@
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s ease;
+  min-width: 100px;
 }
 
 .checkin-btn:hover:not(:disabled) {
@@ -359,44 +361,55 @@
   color: #fff;
 }
 
-.checkin-btn.checkin-completed:disabled {
-  background-color: #28a745;
-  opacity: 0.8;
+/* Botón de sincronización más compacto */
+.sync-calendar-btn {
+  background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  min-width: 120px;
 }
 
 /* Responsive para botones de acciones */
 @media (max-width: 768px) {
-  .dashboard-nav {
-    padding: 0 20px;
-  }
-
-  .nav-tab {
-    padding: 12px 16px;
-    font-size: 14px;
-  }
-
   .habit-item {
     flex-direction: column;
     align-items: stretch;
   }
 
+  .habit-content {
+    margin-bottom: 15px;
+  }
+
   .habit-actions {
     flex-direction: row;
-    justify-content: flex-end;
-    margin-left: 0;
-    margin-top: 15px;
-  }
-
-  .edit-buttons {
-    justify-content: flex-end;
-  }
-
-  .habit-meta {
+    flex-wrap: wrap;
     gap: 8px;
+    margin-left: 0;
+    justify-content: space-between;
   }
 
-  .habit-meta span {
-    font-size: 11px;
-    padding: 3px 6px;
+  .habit-actions button {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Hacer que los botones ocupen el ancho completo en pantallas muy pequeñas */
+  @media (max-width: 480px) {
+    .habit-actions {
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .habit-actions button {
+      width: 100%;
+      flex: none;
+    }
   }
 }

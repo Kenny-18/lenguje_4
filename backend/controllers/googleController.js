@@ -4,7 +4,7 @@ import UserIntegration from "../models/UserIntegration.js"
 // Configuración hardcodeada temporal (SOLO para desarrollo)
 const GOOGLE_CLIENT_ID = "565430349554-9g8iv5nhtaohdqu3a22o3aj2rqe6mki1.apps.googleusercontent.com"
 const GOOGLE_CLIENT_SECRET = "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"
-const GOOGLE_REDIRECT_URI = "http://localhost:3000/api/integrations/google/callback"
+const GOOGLE_REDIRECT_URI = "https://backend-6vc1.onrender.com/api/integrations/google/callback"
 
 // Configurar OAuth2 client con valores hardcodeados
 const oauth2Client = new google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI)

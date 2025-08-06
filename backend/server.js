@@ -24,9 +24,10 @@ const PORT = process.env.PORT || 3000
 app.use(
   cors({
     origin: [
-      process.env.FRONTEND_URL || "http://localhost:3000", 
+      "https://lenguje-4.vercel.app",  // 🔧 Tu frontend en Vercel
+      process.env.FRONTEND_URL || "http://localhost:3001", 
       "http://localhost:5173", 
-      "http://localhost:3001"
+      "http://localhost:3000"
     ],
     credentials: true,
   }),

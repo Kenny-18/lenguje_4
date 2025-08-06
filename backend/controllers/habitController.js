@@ -6,7 +6,7 @@ import { startOfDay, addDays } from "date-fns"
 // Usar las MISMAS credenciales hardcodeadas que en googleController.js
 const GOOGLE_CLIENT_ID = "565430349554-9g8iv5nhtaohdqu3a22o3aj2rqe6mki1.apps.googleusercontent.com"
 const GOOGLE_CLIENT_SECRET = "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"
-const GOOGLE_REDIRECT_URI = "http://localhost:3000/api/integrations/google/callback"
+const GOOGLE_REDIRECT_URI = "https://backend-6vc1.onrender.com/api/integrations/google/callback"
 
 // Helper para obtener el cliente OAuth2
 const getOAuth2Client = async (userId) => {

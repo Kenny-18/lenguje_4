@@ -101,7 +101,7 @@ const ProgressDashboard = () => {
       setLoading(true) // Use loading state for export as well
       const token = await currentUser.getIdToken() // Get the latest ID token
 
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:3000"
+      const backendUrl = "https://backend-6vc1.onrender.com"
       const exportUrl = `${backendUrl}/api/export?format=${format}`
 
       const response = await fetch(exportUrl, {

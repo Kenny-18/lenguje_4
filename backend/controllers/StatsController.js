@@ -1,6 +1,6 @@
 import { startOfDay, subDays, format, eachDayOfInterval } from "date-fns"
 // ✅ Alternativa: importar como módulo completo
-import esLocale from "date-fns/locale/es/index.js"
+import { es as esLocale } from "date-fns/locale";
 import Habit from "../models/Habit.js"
 import Checkin from "../models/Checkin.js"
 

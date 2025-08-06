@@ -280,6 +280,8 @@ export const getAISuggestion = async (req, res) => {
     // Return a random fallback suggestion in case of any error
     const fallbackSuggestion = getRandomFallbackSuggestion()
     console.log("🔄 Using fallback suggestion due to error:", fallbackSuggestion.title)
-    res.status(500).json({ ...fallbackSuggestion, moodConsidered: false }) // Add moodConsidered flag
+    
+    // Cambiar de status 500 a 200 para que el frontend no lo trate como error
+    res.status(200).json({ ...fallbackSuggestion, moodConsidered: false })
   }
 }

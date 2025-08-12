@@ -9,7 +9,8 @@ import GoogleAuthButton from "./GoogleAuthButton"
 import AchievementsList from "./AchievementsList"
 import ThemeToggle from "./ThemeToggle"
 import DailySuggestionCard from "./DailySuggestionCard"
-import MoodTracker from "./MoodTracker" // NEW: Import MoodTracker
+import MoodTracker from "./MoodTracker"
+import NotificationBell from "./NotificationBell" // agregando componente de notificaciones
 import "../ProgressDashboard.css"
 
 const Dashboard = () => {
@@ -45,6 +46,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <NotificationBell />
           <ThemeToggle />
           <GoogleAuthButton />
           <button onClick={handleLogout} className="logout-btn">
@@ -85,7 +87,7 @@ const Dashboard = () => {
         {activeTab === "habits" && <HabitsList />}
         {activeTab === "progress" && <ProgressDashboard />}
         {activeTab === "achievements" && <AchievementsList />}
-        {activeTab === "mood" && <MoodTracker />} {/* NEW: Render MoodTracker */}
+        {activeTab === "mood" && <MoodTracker />}
       </main>
     </div>
   )

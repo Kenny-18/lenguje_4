@@ -319,3 +319,84 @@ export const getHabitById = async (req, res) => {
     })
   }
 }
+
+// PUT /api/habits/:id/reminder - Configurar recordatorios para un hábito
+export const updateHabitReminder = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { time, channels, timezone } = req.body
+
+    // Validar que el hábito existe y pertenece al usuario
+    const habit = await Habit.findOne({ _id: id, userId: req.user.uid })
+    if (!habit) {
+      return res.status(404).json({
+        message: "Hábito no encontrado o no tienes permisos para modificarlo",
+      })
+    }
+
+    // Validar formato de hora (HH:MM)
+    const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
+    if (time && !timeRegex.test(time)) {
+      return res.status(400).json({
+        message: "Formato de hora inválido. Usa HH:MM",
+      })
+    }
+
+    // Validar canales
+    const validChannels = ["email", "in-app"]
+    if (channels && !Array.isArray(channels)) {
+      return res.status(400).json({
+        message: "Los canales deben ser un array",
+      })
+    }
+    if (channels && channels.some((channel) => !validChannels.includes(channel))) {
+      return res.status(400).json({
+        message: "Canales válidos: email, in-app",
+      })
+    }
+
+    // Convertir hora local a UTC si se proporciona
+    let utcTime = null
+    if (time && timezone) {
+      try {
+        // Crear fecha con la hora local del usuario
+        const today = new Date()
+        const [hours, minutes] = time.split(":").map(Number)
+        const localDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hours, minutes)
+
+        // Convertir a UTC considerando la zona horaria
+        const utcDate = new Date(localDate.toLocaleString("en-US", { timeZone: "UTC" }))
+        utcTime = `${utcDate.getHours().toString().padStart(2, "0")}:${utcDate.getMinutes().toString().padStart(2, "0")}`
+      } catch (error) {
+        return res.status(400).json({
+          message: "Error al convertir la hora a UTC",
+        })
+      }
+    }
+
+    // Actualizar recordatorio
+    const updatedHabit = await Habit.findOneAndUpdate(
+      { _id: id, userId: req.user.uid },
+      {
+        reminder: {
+          enabled: !!(time && channels && channels.length > 0),
+          time: utcTime,
+          timezone: timezone || null,
+          channels: channels || [],
+        },
+      },
+      { new: true, runValidators: true },
+    )
+
+    res.status(200).json({
+      message: "Recordatorio actualizado correctamente",
+      habit: updatedHabit,
+    })
+  } catch (error) {
+    console.error("Error al actualizar recordatorio:", error)
+    res.status(500).json({
+      message: "Error al actualizar recordatorio",
+      error: error.message,
+    })
+  }
+}

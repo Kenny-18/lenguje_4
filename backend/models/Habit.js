@@ -45,6 +45,25 @@ const habitSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    reminder: {
+      enabled: {
+        type: Boolean,
+        default: false,
+      },
+      time: {
+        type: String, // Formato HH:MM en UTC
+        default: null,
+      },
+      timezone: {
+        type: String, // Zona horaria del usuario (ej: "America/Mexico_City")
+        default: null,
+      },
+      channels: {
+        type: [String],
+        enum: ["email", "in-app"],
+        default: [],
+      },
+    },
   },
   {
     timestamps: true,

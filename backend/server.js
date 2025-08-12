@@ -2,6 +2,8 @@ import express from "express"
 import cors from "cors"
 import morgan from "morgan"
 import dotenv from "dotenv"
+import { createServer } from "http" // agregando soporte para socket.io
+import { Server } from "socket.io" // importando socket.io
 import connectDB from "./db/connect.js"
 import habitRoutes from "./routes/habitRoutes.js"
 import statsRoutes from "./routes/statsRoutes.js"
@@ -11,23 +13,52 @@ import userRoutes from "./routes/userRoutes.js"
 import aiRoutes from "./routes/aiRoutes.js"
 import shareRoutes from "./routes/shareRoutes.js"
 import moodRoutes from "./routes/moodRoutes.js"
-import exportRoutes from "./routes/exportRoutes.js" // NEW: Import export routes
+import exportRoutes from "./routes/exportRoutes.js"
+import notificationRoutes from "./routes/notificationRoutes.js" // importando rutas de notificaciones
 import { loadSentimentModel } from "./controllers/moodController.js"
+import { initializeReminderJob } from "./services/reminderService.js" // importando servicio de recordatorios
 
 // Configurar variables de entorno
 dotenv.config()
 
 const app = express()
+const server = createServer(app) // creando servidor HTTP para socket.io
 const PORT = process.env.PORT || 3000
+
+const io = new Server(server, {
+  cors: {
+    origin: [
+      "https://lenguje-4.vercel.app",
+      process.env.FRONTEND_URL || "http://localhost:3001",
+      "http://localhost:5173",
+      "http://localhost:3000",
+    ],
+    credentials: true,
+  },
+})
+
+io.on("connection", (socket) => {
+  console.log(`👤 Usuario conectado: ${socket.id}`)
+
+  // El usuario se une a su sala personal para recibir notificaciones
+  socket.on("join", (userId) => {
+    socket.join(userId)
+    console.log(`👤 Usuario ${userId} se unió a su sala personal`)
+  })
+
+  socket.on("disconnect", () => {
+    console.log(`👤 Usuario desconectado: ${socket.id}`)
+  })
+})
 
 // Middlewares
 app.use(
   cors({
     origin: [
-      "https://lenguje-4.vercel.app",  // 🔧 Tu frontend en Vercel
-      process.env.FRONTEND_URL || "http://localhost:3001", 
-      "http://localhost:5173", 
-      "http://localhost:3000"
+      "https://lenguje-4.vercel.app", // 🔧 Tu frontend en Vercel
+      process.env.FRONTEND_URL || "http://localhost:3001",
+      "http://localhost:5173",
+      "http://localhost:3000",
     ],
     credentials: true,
   }),
@@ -52,7 +83,8 @@ app.get("/", (req, res) => {
       ai: "/api/ai",
       share: "/api/share",
       moods: "/api/moods",
-      export: "/api/export", // NEW: Add export endpoint
+      export: "/api/export",
+      notifications: "/api/notifications", // agregando endpoint de notificaciones
     },
   })
 })
@@ -76,7 +108,8 @@ app.use("/api/ai", aiRoutes)
 app.use("/api/share", shareRoutes)
 app.use("/share", shareRoutes) // Ruta pública para compartir (sin /api)
 app.use("/api/moods", moodRoutes)
-app.use("/api/export", exportRoutes) // NEW: Use export routes
+app.use("/api/export", exportRoutes)
+app.use("/api/notifications", notificationRoutes) // agregando rutas de notificaciones
 
 // Middleware de manejo de errores global
 app.use((err, req, res, next) => {
@@ -101,7 +134,8 @@ app.use("*", (req, res) => {
       ai: "/api/ai",
       share: "/api/share",
       moods: "/api/moods",
-      export: "/api/export", // NEW: Include export in error message
+      export: "/api/export",
+      notifications: "/api/notifications", // incluyendo notificaciones en mensaje de error
     },
   })
 })
@@ -116,8 +150,11 @@ const startServer = async () => {
     // Inicializar modelo de sentimientos
     await loadSentimentModel()
 
+    initializeReminderJob(io)
+
     // Iniciar servidor
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
+      // usando server en lugar de app
       console.log(`🚀 Servidor corriendo en puerto ${PORT}`)
       console.log(`🌐 URL base: http://localhost:${PORT}`)
       console.log(`📊 Health check: http://localhost:${PORT}/api/health`)
@@ -129,7 +166,9 @@ const startServer = async () => {
       console.log(`🧠 API AI Suggestions: http://localhost:${PORT}/api/ai/suggest`)
       console.log(`🔗 API Share: http://localhost:${PORT}/api/share`)
       console.log(`😊 API Moods: http://localhost:${PORT}/api/moods`)
-      console.log(`📦 API Export: http://localhost:${PORT}/api/export`) // NEW: Log export endpoint
+      console.log(`📦 API Export: http://localhost:${PORT}/api/export`)
+      console.log(`🔔 API Notifications: http://localhost:${PORT}/api/notifications`) // agregando log de notificaciones
+      console.log(`📡 Socket.IO habilitado para notificaciones en tiempo real`) // agregando log de socket.io
     })
   } catch (error) {
     console.error("❌ Error al inicializar el servidor:", error)

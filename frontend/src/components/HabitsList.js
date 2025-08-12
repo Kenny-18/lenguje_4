@@ -6,7 +6,8 @@ import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import axiosInstance from "../axiosInstance"
 import HabitsSearch from "./HabitsSearch"
-import SyncHabitToCalendarButton from "./SyncHabitToCalendarButton" // ✅ Corregido
+import SyncHabitToCalendarButton from "./SyncHabitToCalendarButton"
+import ReminderConfigButton from "./ReminderConfigButton" // agregando componente de recordatorios
 import "../HabitsSearch.css"
 
 const HabitsList = () => {
@@ -425,7 +426,12 @@ const HabitsList = () => {
                             : "✔ Hoy"}
                       </button>
                     )}
-                    <SyncHabitToCalendarButton habitId={habit._id} habitTitle={habit.title} /> {/* New button */}
+                    <SyncHabitToCalendarButton habitId={habit._id} habitTitle={habit.title} />
+                    <ReminderConfigButton
+                      habitId={habit._id}
+                      habitTitle={habit.title}
+                      currentReminder={habit.reminder}
+                    />
                     <button onClick={() => startEditing(habit)} className="edit-btn" disabled={editingHabit !== null}>
                       Editar
                     </button>

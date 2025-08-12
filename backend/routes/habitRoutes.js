@@ -6,6 +6,7 @@ import {
   deleteHabit,
   getHabitById,
   syncHabitToGoogleCalendar,
+  updateHabitReminder, // agregando endpoint de recordatorios
 } from "../controllers/habitController.js"
 import { authenticateUser } from "../middleware/auth.js"
 import checkinRoutes from "./checkinRoutes.js"
@@ -31,5 +32,6 @@ router.get("/:id", getHabitById) // GET /api/habits/:id
 router.put("/:id", updateHabit) // PUT /api/habits/:id
 router.delete("/:id", deleteHabit) // DELETE /api/habits/:id
 router.post("/:id/sync-calendar", syncHabitToGoogleCalendar) // New route
+router.put("/:id/reminder", updateHabitReminder) // PUT /api/habits/:id/reminder
 
 export default router
